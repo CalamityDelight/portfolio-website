@@ -58,8 +58,9 @@ export function initMenu(nav, works, tags) {
 
   const menu = document.getElementById('menu');
 
-  // The overview button: a small 3D cube, slowly turning, in the header beside the name
-  document.querySelector('.site-header__left').insertAdjacentHTML('beforeend', `
+  // The overview button: a small 3D cube, slowly turning, top right in the header.
+  // It takes the magnetic field readout's place on every face except the hero.
+  document.querySelector('.site-header__right').insertAdjacentHTML('beforeend', `
     <button class="overview" type="button" aria-controls="menu" aria-expanded="false" aria-label="Overview of all works (Space)">
       <span class="mini-cube" aria-hidden="true">
         <i class="mini-cube__face mini-cube__face--front"></i>

@@ -215,7 +215,7 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
   line-height: 1.5;
 }
 .logo span { display: block; font-weight: 400; color: var(--glow); opacity: 0.8; }
-.site-header__left { display: flex; align-items: center; gap: var(--space-3); }
+
 
 /* Where you are, in the middle of the header: "Introduction" or the project's title */
 .site-header__place {
@@ -234,7 +234,8 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
   color: var(--text);
   transition: opacity 0.25s;
 }
-.site-header__place.is-changing { opacity: 0; }
+.site-header__place.is-changing,
+.at-start .site-header__place { opacity: 0; }   /* the hero needs no label */
 
 /* Discreet footer at the bottom of the CV */
 .site-footer {

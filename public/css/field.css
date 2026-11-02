@@ -1,6 +1,11 @@
 /* Earth's magnetic field: the header readout and its vibrating circle */
 
-.site-header__right { display: flex; align-items: center; gap: var(--space-3); }
+/* The readout and the overview cube share the top-right corner, stacked in one
+   grid cell: the hero shows the readout, every other face the overview cube. */
+.site-header__right { display: grid; justify-items: end; align-items: center; }
+.site-header__right > * { grid-area: 1 / 1; transition: opacity 0.4s, visibility 0.4s; }
+.at-start .overview,
+html:not(.at-start) .kp { opacity: 0; visibility: hidden; }
 
 .kp {
   display: flex;

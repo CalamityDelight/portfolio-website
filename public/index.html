@@ -24,13 +24,11 @@
   <canvas id="water" aria-hidden="true"></canvas>
 
   <header class="site-header">
-    <!-- Name, and the overview cube beside it (added by menu.js) -->
-    <div class="site-header__left">
-      <a class="logo" href="#home">Axel af Ugglas<span>AI video &amp; film</span></a>
-    </div>
+    <a class="logo" href="#home">Axel af Ugglas<span>AI video &amp; film</span></a>
     <!-- Where you are: "Introduction" or the project's title (set by cube.js) -->
     <p class="site-header__place" aria-hidden="true"></p>
-    <!-- Filled by JS: the magnetic field readout (field.js) -->
+    <!-- Top right: the magnetic field readout on the hero (field.js), the overview cube
+         everywhere else (menu.js). They swap places via html.at-start (cube.js). -->
     <div class="site-header__right"></div>
   </header>
 

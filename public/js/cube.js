@@ -94,6 +94,8 @@ export function initCube(cube) {
     const { col, level } = state;
     updateArrows();
     updatePlace(col);
+    // The hero is the very first face: no place label, magnetic field shown (base.css, field.css)
+    root.classList.toggle('at-start', col === 0 && level === 0);
 
 
     // Tell screen readers where we are, and keep the place in the URL so a refresh stays put
