@@ -3,7 +3,7 @@
 // and only one face shows at a time. Moving turns the cube 90° in 3D:
 // left/right switches column (always landing at the top), up/down changes level.
 
-const DURATION = 950; // ms for one turn of the cube
+const DURATION = 1300; // ms for one turn of the cube: slow and fluid
 
 export function initCube(cube, { particles } = {}) {
   const box = cube.querySelector('.cube__box');
@@ -119,6 +119,7 @@ export function initCube(cube, { particles } = {}) {
     const { place, turn } = SIDES[dir];
 
     particles?.burst(box.getBoundingClientRect(), dir, DURATION);
+    window.magneticField?.surge(); // the field swells as the cube moves through it
 
     from.style.transform = `translateZ(${depth}px)`;
     to.style.transform = `${place} translateZ(${depth}px)`;
@@ -127,7 +128,8 @@ export function initCube(cube, { particles } = {}) {
     box.style.transition = 'none';
     box.style.transform = `translateZ(${-depth}px)`;
     box.getBoundingClientRect(); // make the browser apply the start position before animating
-    box.style.transition = `transform ${DURATION}ms cubic-bezier(0.65, 0, 0.35, 1)`;
+    // Soft start, long gentle settle: the cube glides like something moving through water
+    box.style.transition = `transform ${DURATION}ms cubic-bezier(0.5, 0, 0.15, 1)`;
     box.style.transform = `translateZ(${-depth}px) ${turn}`;
 
     root.classList.add('is-turning');
@@ -215,25 +217,37 @@ export function initCube(cube, { particles } = {}) {
 
   // ---------- Two-finger swipe on a laptop trackpad (and the mouse wheel) ----------
   // A trackpad swipe arrives as many small "wheel" events, and keeps coming for a
-  // while after the fingers lift (momentum). Events less than 250 ms apart count as
-  // one gesture, and one gesture moves the cube at most once.
-  let gesture = { lastEvent: 0, x: 0, y: 0, used: false, atTop: true, atBottom: true };
+  // while after the fingers lift (momentum, getting weaker). One gesture moves the
+  // cube at most once. A new gesture starts after a short pause, or when the deltas
+  // suddenly get stronger again: that is a new swipe on top of the old momentum.
+  let gesture = { last: 0, prev: 0, x: 0, y: 0, used: false, atTop: true, atBottom: true };
 
-  cube.addEventListener('wheel', (e) => {
-    if (menuOpen()) return;
+  window.addEventListener('wheel', (e) => {
+    if (menuOpen() || e.ctrlKey) return; // ctrlKey = pinch to zoom
+    if (e.target.closest?.('input, textarea, select')) return;
+
+    // Some browsers (Firefox) count in lines or pages instead of pixels
+    const scale = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? window.innerHeight : 1;
+    const dx = e.deltaX * scale;
+    const dy = e.deltaY * scale;
+    const size = Math.max(Math.abs(dx), Math.abs(dy));
     const now = performance.now();
     const panel = grid[state.col][state.level];
-    if (now - gesture.lastEvent > 250) {
-      gesture = { x: 0, y: 0, used: false, atTop: !canScroll(panel, 'up'), atBottom: !canScroll(panel, 'down') };
-    }
-    gesture.lastEvent = now;
 
-    // Sideways: always turns the cube
-    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+    const paused = now - gesture.last > 200;
+    const newSwipe = gesture.used && !state.busy && size > gesture.prev * 2 && size > 12;
+    if (paused || newSwipe) {
+      gesture = { prev: 0, x: 0, y: 0, used: false, atTop: !canScroll(panel, 'up'), atBottom: !canScroll(panel, 'down') };
+    }
+    gesture.last = now;
+    gesture.prev = size;
+
+    // Sideways: always turns the cube (and stops the browser's "swipe back")
+    if (Math.abs(dx) > Math.abs(dy)) {
       e.preventDefault();
       if (gesture.used || state.busy) return;
-      gesture.x += e.deltaX;
-      if (Math.abs(gesture.x) > 50) {
+      gesture.x += dx;
+      if (Math.abs(gesture.x) > 30) {
         gesture.used = true;
         move(gesture.x > 0 ? 'right' : 'left');
       }
@@ -242,12 +256,12 @@ export function initCube(cube, { particles } = {}) {
 
     // Up and down: the face scrolls normally; past its edge, the cube turns
     if (gesture.used || state.busy) { e.preventDefault(); return; }
-    const dir = e.deltaY > 0 ? 'down' : 'up';
+    const dir = dy > 0 ? 'down' : 'up';
     if (canScroll(panel, dir)) return;
     if ((dir === 'down' && !gesture.atBottom) || (dir === 'up' && !gesture.atTop)) return;
     e.preventDefault();
-    gesture.y += e.deltaY;
-    if (Math.abs(gesture.y) > 60) {
+    gesture.y += dy;
+    if (Math.abs(gesture.y) > 40) {
       gesture.used = true;
       move(dir);
     }

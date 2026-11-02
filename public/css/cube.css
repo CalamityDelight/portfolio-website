@@ -1,8 +1,9 @@
 /* The cube. Only applies once cube.js has run (html.cube-ready), so without
    JavaScript the site is still one long readable page.
 
-   Every panel is a face of the cube. The cube fills most of the screen, between
-   the header and the navigation bar, with the magnetic field all around it. */
+   Every panel is a face of the cube, and the cube is the whole screen: the
+   magnetic field lives inside it and the content floats in the field. Only
+   while the cube turns do its faces and edges show, glowing faintly. */
 
 :root {
   --header-h: 4.5rem;
@@ -14,16 +15,13 @@
 .cube-ready .cube {
   position: fixed;
   inset: 0;
-  perspective: 2400px;          /* how deep the 3D turn looks: lower = more dramatic */
+  perspective: 1800px;          /* how deep the 3D turn looks: lower = more dramatic */
 }
 
 /* The box that turns. cube.js rotates it in 3D during a move. */
 .cube-ready .cube__box {
   position: absolute;
-  top: var(--header-h);
-  bottom: var(--navbar-h);
-  left: 6vw;
-  right: 6vw;
+  inset: 0;
   transform-style: preserve-3d;
 }
 .cube-ready .column {
@@ -42,29 +40,30 @@
   container-type: size;         /* lets content size itself to the face (cqh units) */
   visibility: hidden;
   backface-visibility: hidden;
-  background:
-    radial-gradient(ellipse at 15% 0%, rgba(123, 77, 255, 0.1), transparent 55%),
-    var(--face);
-  border: 1px solid rgba(198, 255, 26, 0.16);
-  box-shadow:
-    0 0 30px rgba(198, 255, 26, 0.05),
-    inset 0 0 60px rgba(123, 77, 255, 0.06),
-    0 40px 120px rgba(0, 0, 0, 0.7);
+  border: 1px solid transparent;
+  transition: background 0.4s, border-color 0.4s, box-shadow 0.4s;
   scrollbar-width: thin;
   scrollbar-color: var(--purple-dim) transparent;
 }
 .cube-ready .panel.is-active { visibility: visible; }
 .cube-ready .panel:focus { outline: none; }
 
-/* While turning, the cube's edges light up like neon tubes */
+/* While turning, the faces get a dark veil and glowing turquoise edges,
+   so the cube becomes visible as it rolls through the field */
 .cube-ready.is-turning .panel {
-  border-color: rgba(198, 255, 26, 0.55);
-  box-shadow: 0 0 40px rgba(198, 255, 26, 0.18), inset 0 0 40px rgba(198, 255, 26, 0.06);
+  background: var(--face);
+  border-color: rgba(94, 240, 196, 0.35);
+  box-shadow: 0 0 60px rgba(94, 240, 196, 0.14), inset 0 0 80px rgba(94, 240, 196, 0.06);
 }
 
-.cube-ready .panel__inner { min-height: 100%; }
+/* Content clears the header at the top and the navigation bar at the bottom */
+.cube-ready .panel__inner {
+  min-height: 100%;
+  padding-top: calc(var(--header-h) + var(--space-3));
+  padding-bottom: calc(var(--navbar-h) + var(--space-2));
+}
 
-/* The green particles canvas sits over the cube, under the header and navbar */
+/* The turquoise particles canvas sits over the cube, under the header and navbar */
 #particles {
   position: fixed;
   inset: 0;
@@ -99,17 +98,17 @@
 .arrow {
   display: grid;
   place-items: center;
-  border: 1px solid rgba(198, 255, 26, 0.55);
+  border: 1px solid rgba(94, 240, 196, 0.55);
   border-radius: 5px;
   background: rgba(7, 4, 13, 0.6);
-  color: var(--green);
+  color: var(--glow);
   font: inherit;
   font-size: 0.75rem;
   cursor: pointer;
   animation: neon-box 4.5s ease-in-out infinite;
   transition: border-color 0.2s, opacity 0.3s;
 }
-.arrow:hover { border-color: var(--green); box-shadow: 0 0 14px var(--green-glow); }
+.arrow:hover { border-color: var(--glow); box-shadow: 0 0 14px var(--glow-soft); }
 .arrow[hidden] { display: grid; visibility: hidden; } /* keep the key layout steady */
 .arrow--up { grid-column: 2; grid-row: 1; }
 .arrow--left { grid-column: 1; grid-row: 2; }
@@ -129,10 +128,10 @@
 .arrows.is-hint .arrow--left { animation-delay: 2.4s; }
 @keyframes key-hint {
   0%, 30%, 100% { border-color: var(--line); color: var(--text-muted); box-shadow: none; }
-  10%, 18% { border-color: var(--green); color: var(--green); box-shadow: 0 0 12px var(--green-glow); }
+  10%, 18% { border-color: var(--glow); color: var(--glow); box-shadow: 0 0 12px var(--glow-soft); }
 }
 
-/* Dot indicator: one small stack per column; the green dot is where you are */
+/* Dot indicator: one small stack per column; the glowing dot is where you are */
 .dots {
   display: flex;
   align-items: flex-start;
@@ -147,7 +146,7 @@
   background: var(--text-muted);
   transition: background 0.3s, box-shadow 0.3s;
 }
-.dots i.is-active { background: var(--green); box-shadow: 0 0 8px var(--green); }
+.dots i.is-active { background: var(--glow); box-shadow: 0 0 8px var(--glow); }
 
 @media (max-width: 700px) {
   :root { --header-h: 4rem; --navbar-h: 5rem; }
