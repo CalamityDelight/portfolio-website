@@ -1,0 +1,10 @@
+# Dependencies are reinstalled with `npm install`, so they don't belong in Git
+node_modules/
+
+# Secrets live only on your own machine
+.env
+
+# OS and editor clutter
+.DS_Store
+.vscode/
+*.log
