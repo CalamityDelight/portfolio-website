@@ -168,6 +168,9 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
 /* Content sits above the fibre canvas */
 .cube { position: relative; z-index: 1; }
 
+/* A soft dark halo keeps text readable where it crosses bright fibres */
+.panel p, .panel li, .panel h1, .panel h2 { text-shadow: 0 1px 14px rgba(10, 6, 17, 0.95); }
+
 /* A panel is one "level" of a column: at least one screen tall */
 .panel {
   min-height: 100vh;

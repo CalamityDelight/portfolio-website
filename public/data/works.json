@@ -1,0 +1,50 @@
+[
+  {
+    "slug": "placeholder-work-one",
+    "position": 1,
+    "title": "Placeholder Work One",
+    "year": 2026,
+    "video_url": "https://res.cloudinary.com/demo/video/upload/dog.mp4",
+    "summary": "Placeholder AI summary. Axel directed this short film from a single written idea to a finished edit, using AI image and video tools for every shot. The summary will be generated in the studio and approved by Axel before it appears here.",
+    "process": [
+      { "type": "text", "text": "Placeholder process text. The project started as a one-line idea, which was expanded into a short script and a shot list before any images were generated." },
+      { "type": "list", "items": ["Script and shot list", "Style frames in Midjourney", "Shots animated in Runway", "Edit and sound design"] },
+      { "type": "text", "text": "Each shot was tested in several versions. The hardest part was keeping the main character consistent from shot to shot, which was solved with a fixed set of reference images." }
+    ],
+    "reference_images": [
+      { "url": "", "alt": "Placeholder reference image one" },
+      { "url": "", "alt": "Placeholder reference image two" },
+      { "url": "", "alt": "Placeholder reference image three" }
+    ],
+    "tags": ["Midjourney", "Runway", "Direction", "Editing"]
+  },
+  {
+    "slug": "placeholder-work-two",
+    "position": 2,
+    "title": "Placeholder Work Two",
+    "year": 2026,
+    "video_url": "",
+    "summary": "Placeholder AI summary for the second work.",
+    "process": [
+      { "type": "text", "text": "Placeholder process text for the second work. Here Axel will describe how the idea developed and which tools were used." },
+      { "type": "list", "items": ["Concept", "Previz in Blender", "Video generation", "Music in Suno"] }
+    ],
+    "reference_images": [
+      { "url": "", "alt": "Placeholder reference image" }
+    ],
+    "tags": ["Blender", "Suno", "Previz"]
+  },
+  {
+    "slug": "placeholder-work-three",
+    "position": 3,
+    "title": "Placeholder Work Three",
+    "year": 2025,
+    "video_url": "",
+    "summary": "Placeholder AI summary for the third work.",
+    "process": [
+      { "type": "text", "text": "Placeholder process text for the third work." }
+    ],
+    "reference_images": [],
+    "tags": ["Storytelling"]
+  }
+]

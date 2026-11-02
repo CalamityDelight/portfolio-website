@@ -1,0 +1,236 @@
+/* Work columns: video, AI summary, process, references, comments */
+
+/* ---------- Video ---------- */
+.work-video {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.player {
+  position: relative;
+  width: min(100%, calc(72vh * 16 / 9));   /* never taller than 72% of the screen */
+  margin: 0 auto;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+.player video { width: 100%; height: 100%; object-fit: contain; }
+.player--empty {
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(ellipse at 70% 60%, rgba(123, 77, 255, 0.2), transparent 60%),
+    var(--bg-raised);
+}
+
+/* Big round play button in the middle, hidden while playing */
+.player__big {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 4.5rem;
+  height: 4.5rem;
+  border: 1px solid var(--green);
+  border-radius: 50%;
+  background: rgba(10, 6, 17, 0.4);
+  color: var(--green);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: opacity 0.3s, box-shadow 0.3s;
+}
+.player__big:hover { box-shadow: 0 0 24px var(--green-glow); }
+.player.is-playing .player__big { opacity: 0; pointer-events: none; }
+
+/* Thin control bar along the bottom; fades in on hover or keyboard focus */
+.player__bar {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  background: linear-gradient(transparent, rgba(10, 6, 17, 0.85));
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.player:hover .player__bar,
+.player:focus-within .player__bar,
+.player:not(.is-playing) .player__bar { opacity: 1; }
+
+.player__bar button {
+  background: none;
+  border: 0;
+  padding: 0.25rem;
+  color: var(--green);
+  font: inherit;
+  font-size: var(--size-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.player__time {
+  font-size: var(--size-label);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Seek slider drawn as a thin line, green up to the current time */
+.player__seek {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 2px;
+  background: linear-gradient(90deg, var(--green) var(--progress, 0%), var(--line) var(--progress, 0%));
+  cursor: pointer;
+}
+.player__seek::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--green);
+}
+.player__seek::-moz-range-thumb {
+  width: 10px; height: 10px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--green);
+}
+
+.work-title {
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.work-title__name {
+  font-size: var(--size-h3);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: var(--track-title);
+}
+
+/* ---------- AI summary ---------- */
+.summary {
+  max-width: 44rem;
+  margin-left: auto;                 /* pushed right: asymmetric placement */
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-left: 1px solid var(--green);
+  background: linear-gradient(120deg, rgba(123, 77, 255, 0.1), rgba(10, 6, 17, 0.6));
+}
+.summary__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+/* Small graph-like line, the same "data look" the Kp readout will use */
+.summary__graph {
+  flex: 1;
+  height: 14px;
+  background:
+    linear-gradient(var(--green), var(--green)) 0 50% / 100% 1px no-repeat,
+    repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 12px);
+  opacity: 0.5;
+}
+.summary__text { font-size: var(--size-lead); font-weight: 300; margin-bottom: var(--space-4); }
+.summary h3 { margin-bottom: var(--space-2); }
+
+.tag-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+.tag-list li {
+  padding: 0.3em 0.9em;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ---------- Process ---------- */
+.process > * { max-width: var(--measure); margin-left: 12%; }
+.process h2 { margin-top: var(--space-2); margin-bottom: var(--space-4); }
+.process p { margin-bottom: var(--space-3); }
+.process__list {
+  margin: 0 0 var(--space-3) 12%;
+  padding: 0;
+  list-style: none;
+  border-left: 1px solid var(--green);
+}
+.process__list li {
+  padding: 0.35rem 0 0.35rem var(--space-3);
+  color: var(--text-muted);
+}
+
+/* ---------- References ---------- */
+.refs {
+  margin-top: var(--space-4);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--space-3);
+}
+.refs figure { margin: 0; }
+.refs img { width: 100%; height: auto; border: 1px solid var(--line); }
+.ref-placeholder {
+  aspect-ratio: 4 / 3;
+  display: flex;
+  align-items: flex-end;
+  padding: var(--space-2);
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(ellipse at 40% 40%, rgba(123, 77, 255, 0.18), transparent 65%),
+    var(--bg-raised);
+}
+
+/* ---------- Comments ---------- */
+.comments { max-width: 48rem; }
+.comments h2 { margin-top: var(--space-2); }
+.comment-list { list-style: none; margin: 0 0 var(--space-4); padding: 0; }
+
+.comment-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  align-items: end;
+}
+.field { display: flex; flex-direction: column; gap: 0.4rem; }
+.field--wide { grid-column: 1 / -1; }
+.field label {
+  font-size: var(--size-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.field input,
+.field textarea {
+  padding: 0.7rem 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  resize: vertical;
+}
+.field input:focus,
+.field textarea:focus { outline: none; border-bottom-color: var(--green); }
+.comment-form .btn { justify-self: start; }
+
+/* ---------- Phones ---------- */
+@media (max-width: 700px) {
+  .summary { padding: var(--space-3); }
+  .process > *, .process__list { margin-left: 0; }
+  .comment-form { grid-template-columns: 1fr; }
+  .player__full { display: none; }   /* phones open full screen from the video itself */
+}
