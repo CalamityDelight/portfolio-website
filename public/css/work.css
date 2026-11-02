@@ -141,8 +141,10 @@
     repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 12px);
   opacity: 0.5;
 }
-.summary__text { font-size: var(--size-lead); font-weight: 300; margin-bottom: var(--space-4); }
-.summary h3 { margin-bottom: var(--space-2); }
+.summary__text { font-size: var(--size-lead); font-weight: 300; margin-bottom: var(--space-3); }
+.summary__text:last-of-type { margin-bottom: var(--space-4); }
+.summary h3 { margin: var(--space-3) 0 var(--space-2); }
+.summary__note { margin: var(--space-4) 0 0; font-size: 0.8rem; color: var(--text-muted); }
 
 .tag-list {
   list-style: none;

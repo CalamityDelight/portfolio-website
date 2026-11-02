@@ -146,6 +146,19 @@ progress::-moz-progress-bar { background: var(--green); }
 .image { display: grid; grid-template-columns: 8rem 1fr auto; gap: var(--space-2); align-items: end; }
 .image img { width: 8rem; aspect-ratio: 4 / 3; object-fit: cover; border: 1px solid var(--line); }
 
+/* Approved summary: what visitors will see */
+.approved {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border-left: 1px solid var(--green);
+  background: rgba(198, 255, 26, 0.03);
+}
+.approved__text { margin: 0; max-width: none; white-space: pre-line; color: var(--text-muted); }
+.approved .btn { justify-self: start; }
+#f-draft { border: 1px solid var(--line); padding: var(--space-1); font-size: 1rem; }
+#f-draft:focus { border-color: var(--green); }
+
 /* Tags as toggle pills */
 .tag-picker { display: flex; flex-wrap: wrap; gap: var(--space-1); }
 .tag-option input { position: absolute; opacity: 0; }

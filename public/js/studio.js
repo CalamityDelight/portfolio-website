@@ -11,6 +11,7 @@ let current = null;  // the work being edited (null = a new one)
 let blocks = [];     // process blocks being edited
 let images = [];     // reference images being edited
 let tagList = [];    // the fixed tag list
+let approved = '';   // the approved AI summary (the only summary that gets published)
 
 // ---------- Talking to the server ----------
 
@@ -71,7 +72,8 @@ function openEditor(post) {
   form.year.value = p.year ?? '';
   form.position.value = p.position;
   form.video_url.value = p.video_url;
-  form.summary.value = p.summary;
+  approved = p.summary || '';
+  draftEl.value = approved; // start from the published text, so small tweaks are easy
 
   // Copies, so Cancel leaves the saved work untouched
   blocks = structuredClone(p.process || []);
@@ -84,6 +86,7 @@ function openEditor(post) {
   renderBlocks();
   renderImages();
   renderTags(p.tags);
+  renderSummary();
   loadPosts(); // refresh the highlight in the list
 
   editor.hidden = false;
@@ -274,6 +277,55 @@ function renderTags(selected) {
     </label>`).join('');
 }
 
+// ---------- AI summary ----------
+
+const draftEl = document.getElementById('f-draft');
+const draftStatus = document.getElementById('draft-status');
+
+function renderSummary() {
+  document.getElementById('approved-summary').textContent = approved || 'Nothing approved yet.';
+  document.getElementById('remove-summary').hidden = !approved;
+  draftStatus.textContent = draftEl.value.trim() && draftEl.value.trim() !== approved ? 'Draft not approved yet' : '';
+}
+draftEl.addEventListener('input', renderSummary);
+
+document.getElementById('generate-summary').addEventListener('click', async (e) => {
+  const button = e.currentTarget;
+  button.disabled = true;
+  button.textContent = 'Writing…';
+  try {
+    // Sends what's in the form right now, saved or not
+    const { draft } = await api('/api/summary', {
+      method: 'POST',
+      body: {
+        title: form.title.value,
+        process: blocks,
+        tags: [...form.querySelectorAll('input[name="tags"]:checked')].map((c) => c.value),
+      },
+    });
+    draftEl.value = draft;
+    renderSummary();
+    draftEl.focus();
+  } catch (err) {
+    showMessage(err.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = 'Generate summary';
+  }
+});
+
+document.getElementById('approve-summary').addEventListener('click', () => {
+  approved = draftEl.value.trim();
+  renderSummary();
+  showMessage(approved ? 'Summary approved. Save to publish it.' : 'The draft is empty.', Boolean(approved));
+});
+
+document.getElementById('remove-summary').addEventListener('click', () => {
+  approved = '';
+  renderSummary();
+  showMessage('Summary removed. Save to update the site.', true);
+});
+
 // ---------- Save and delete ----------
 
 form.addEventListener('submit', async (e) => {
@@ -290,7 +342,7 @@ form.addEventListener('submit', async (e) => {
     year: form.year.value,
     position: form.position.value,
     video_url: form.video_url.value.trim(),
-    summary: form.summary.value,
+    summary: approved,
     process: blocks,
     reference_images: images,
     tags: [...form.querySelectorAll('input[name="tags"]:checked')].map((c) => c.value),

@@ -37,9 +37,29 @@ function videoPanel(work) {
     </article>`;
 }
 
+// The approved summary is plain text: paragraphs, then "Tools: a, b" and
+// "Skills: c, d" lines. Split it so the lists can be shown as pills.
+function parseSummary(summary) {
+  const result = { paragraphs: [], tools: [], skills: [] };
+  for (const line of String(summary || '').split('\n').map((l) => l.trim()).filter(Boolean)) {
+    const list = line.match(/^(tools|skills)\s*:\s*(.+)$/i);
+    if (list) result[list[1].toLowerCase()] = list[2].split(',').map((x) => x.trim().replace(/\.$/, '')).filter(Boolean);
+    else result.paragraphs.push(line);
+  }
+  return result;
+}
+
+const pills = (items) => `<ul class="tag-list">${items.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>`;
+
 // Level 2: AI summary, shown as a designed card rather than plain text
 function summaryPanel(work) {
-  const tags = work.tags.map((t) => `<li>${esc(t)}</li>`).join('');
+  const { paragraphs, tools, skills } = parseSummary(work.summary);
+  // No Tools/Skills lines in the summary? Fall back to the work's tags.
+  const lists = tools.length || skills.length
+    ? `${tools.length ? `<h3 class="label">Tools</h3>${pills(tools)}` : ''}
+       ${skills.length ? `<h3 class="label">Skills</h3>${pills(skills)}` : ''}`
+    : work.tags.length ? `<h3 class="label">Tools, skills and roles</h3>${pills(work.tags)}` : '';
+
   return `
     <article class="panel" data-level="AI summary">
       <div class="panel__inner">
@@ -48,9 +68,11 @@ function summaryPanel(work) {
             <span class="label label--accent">AI summary</span>
             <span class="summary__graph" aria-hidden="true"></span>
           </header>
-          <p class="summary__text">${esc(work.summary)}</p>
-          <h3 class="label">Tools, skills and roles</h3>
-          <ul class="tag-list">${tags}</ul>
+          ${paragraphs.length
+            ? paragraphs.map((p) => `<p class="summary__text">${esc(p)}</p>`).join('')
+            : '<p class="summary__text muted">Summary coming soon.</p>'}
+          ${lists}
+          <p class="summary__note">Drafted with AI from Axel's process notes, edited and approved by Axel.</p>
         </section>
       </div>
     </article>`;

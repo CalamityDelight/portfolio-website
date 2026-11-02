@@ -75,15 +75,6 @@
           <progress id="video-progress" max="100" value="0" hidden></progress>
         </fieldset>
 
-        <!-- Summary (Part 3 adds "Generate summary" with AI) -->
-        <fieldset class="editor-block">
-          <legend class="label">Summary</legend>
-          <div class="field">
-            <label for="f-summary">Approved summary, shown under the video</label>
-            <textarea id="f-summary" name="summary" rows="5"></textarea>
-          </div>
-        </fieldset>
-
         <!-- Process blocks -->
         <fieldset class="editor-block">
           <legend class="label">Process</legend>
@@ -109,6 +100,28 @@
         <fieldset class="editor-block">
           <legend class="label">Tags</legend>
           <div id="tags" class="tag-picker"></div>
+        </fieldset>
+
+        <!-- AI summary: generate a draft, edit it, approve it. Only the approved text is published. -->
+        <fieldset class="editor-block">
+          <legend class="label">AI summary</legend>
+          <p class="hint">Made from the title, process and tags above. Edit the draft, then approve it.</p>
+          <div class="row">
+            <button class="btn btn--quiet" type="button" id="generate-summary">Generate summary</button>
+          </div>
+          <div class="field">
+            <label for="f-draft">Draft</label>
+            <textarea id="f-draft" rows="8" placeholder="Click Generate summary, or write your own."></textarea>
+          </div>
+          <div class="row">
+            <button class="btn btn--quiet" type="button" id="approve-summary">Approve draft</button>
+            <span class="hint" id="draft-status" role="status"></span>
+          </div>
+          <div class="approved">
+            <span class="label">Approved · shown on the site after you save</span>
+            <p id="approved-summary" class="approved__text"></p>
+            <button class="btn btn--quiet" type="button" id="remove-summary" hidden>Remove summary</button>
+          </div>
         </fieldset>
 
         <p class="form-message" id="form-message" role="status"></p>
