@@ -1,68 +1,86 @@
-// Earth's magnetic field readout in the header, and the faint site pulse.
-// The more disturbed the field (higher Kp), the stronger and faster the pulse.
+// Earth's magnetic field: the header readout, its live intensity line, and the
+// switch that turns the magnetic waves off (the background then becomes a still image).
 
-const STORAGE_KEY = 'field-pulse';
+const STORAGE_KEY = 'magnetic-effects';
 
-// A tiny line graph of the last 24 hours, drawn as an SVG polyline
-function sparkline(values) {
-  const w = 44;
-  const h = 14;
-  const points = values.map((v, i) => {
-    const x = (i / Math.max(values.length - 1, 1)) * w;
-    const y = h - (Math.min(v, 9) / 9) * h; // Kp 0 at the bottom, 9 at the top
-    return `${x.toFixed(1)},${y.toFixed(1)}`;
-  }).join(' ');
-  return `<svg class="kp__graph" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true">
-            <polyline points="${points}" /></svg>`;
+// A small neon line that ripples as hard as the field: calm at Kp 0, wild at Kp 9
+function startIntensityLine(canvas, getIntensity) {
+  const ctx = canvas.getContext('2d');
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = canvas.width = 76 * dpr;
+  const h = canvas.height = 20 * dpr;
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let last = 0;
+
+  function draw(now) {
+    if (now - last > 33) {
+      last = now;
+      const k = getIntensity();
+      const t = still ? 0 : now / 1000;
+      ctx.clearRect(0, 0, w, h);
+      ctx.strokeStyle = '#c6ff1a';
+      ctx.lineWidth = 1.2 * dpr;
+      ctx.shadowColor = 'rgba(198, 255, 26, 0.8)';
+      ctx.shadowBlur = 4 * dpr;
+      ctx.beginPath();
+      for (let x = 0; x <= w; x += dpr) {
+        const p = x / w;
+        // Taller, tighter, faster waves as Kp rises; the ends taper to a point
+        const amp = (0.12 + 0.75 * k) * (h / 2 - 2 * dpr) * Math.sin(Math.PI * p);
+        const y = h / 2 + amp * Math.sin(p * (6 + 10 * k) - t * (2 + 6 * k));
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+    if (!still) requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
 }
 
 export async function initField() {
-  const header = document.querySelector('.site-header__right');
-  header.insertAdjacentHTML('afterbegin', `
-    <div class="kp" aria-live="polite">
-      <span class="kp__dot" aria-hidden="true"></span>
-      <span class="kp__text">Earth's field · reading…</span>
-      <button class="kp__toggle" type="button" aria-pressed="true" title="Turn the site pulse on or off">
-        Pulse on
-      </button>
+  const slot = document.querySelector('.site-header__right');
+  slot.insertAdjacentHTML('afterbegin', `
+    <div class="kp">
+      <span class="kp__text" aria-live="polite"><span class="kp__name">Earth's magnetic field</span> <span class="kp__value">· reading…</span></span>
+      <canvas class="kp__line" aria-hidden="true"></canvas>
+      <button class="kp__toggle" type="button" aria-pressed="true">Turn off effects</button>
     </div>`);
 
-  const field = header.querySelector('.kp');
-  const text = field.querySelector('.kp__text');
-  const toggle = field.querySelector('.kp__toggle');
+  const kp = slot.querySelector('.kp');
+  const value = kp.querySelector('.kp__value');
+  const toggle = kp.querySelector('.kp__toggle');
   const root = document.documentElement;
+  let intensity = 0.2;
 
-  // Pulse on unless the visitor turned it off before, or asks their system for less motion
+  // Waves on unless the visitor turned them off before, or asks their system for less motion
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let pulseOn = (localStorage.getItem(STORAGE_KEY) ?? (reducedMotion ? 'off' : 'on')) === 'on';
+  let on = (localStorage.getItem(STORAGE_KEY) ?? (reducedMotion ? 'off' : 'on')) === 'on';
 
-  function applyPulse() {
-    root.classList.toggle('pulse-on', pulseOn);
-    toggle.setAttribute('aria-pressed', String(pulseOn));
-    toggle.textContent = pulseOn ? 'Pulse on' : 'Pulse off';
+  function apply() {
+    root.classList.toggle('field-off', !on); // shows the still image (field.css)
+    window.magneticField.setEnabled(on);
+    toggle.setAttribute('aria-pressed', String(on));
+    toggle.textContent = on ? 'Turn off effects' : 'Turn on effects';
   }
   toggle.addEventListener('click', () => {
-    pulseOn = !pulseOn;
-    localStorage.setItem(STORAGE_KEY, pulseOn ? 'on' : 'off');
-    applyPulse();
+    on = !on;
+    localStorage.setItem(STORAGE_KEY, on ? 'on' : 'off');
+    apply();
   });
+
+  startIntensityLine(kp.querySelector('.kp__line'), () => intensity);
+  apply();
 
   try {
     const res = await fetch('/api/kp');
     if (!res.ok) throw new Error();
     const data = await res.json();
-
-    text.innerHTML = `<span class="kp__name">Earth's field · </span>Kp ${data.kp} · ${data.label} ${sparkline(data.history)}`;
-    field.title = `Planetary Kp index ${data.exact} (NOAA), measured ${new Date(data.time + 'Z').toUTCString()}`;
-
-    // 0 = barely visible, 1 = strongest. Kp 0 still gets a faint pulse.
-    const strength = 0.2 + (Math.min(data.kp, 9) / 9) * 0.8;
-    root.style.setProperty('--pulse-strength', strength.toFixed(2));
-    root.style.setProperty('--pulse-speed', `${(7 - strength * 4).toFixed(1)}s`); // 6.2s calm, 3s storm
-    root.dataset.field = data.label;
-    applyPulse();
+    value.textContent = `· Kp ${data.kp} · ${data.label}`;
+    kp.title = `Planetary Kp index ${data.exact} (NOAA), measured ${new Date(data.time + 'Z').toUTCString()}`;
+    intensity = Math.min(data.exact, 9) / 9; // Kp 0–9 becomes 0–1
+    window.magneticField.setIntensity(intensity);
   } catch {
-    text.textContent = "Earth's field · no reading";
-    toggle.hidden = true;
+    value.textContent = '· no reading';
   }
 }
