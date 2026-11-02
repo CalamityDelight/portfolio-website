@@ -58,12 +58,20 @@ export function initMenu(nav, works, tags) {
 
   const menu = document.getElementById('menu');
 
-  // The Overview button lives in the header, top right
-  document.querySelector('.site-header__right').insertAdjacentHTML('beforeend',
-    `<button class="btn btn--quiet menu-toggle" type="button" aria-controls="menu" aria-expanded="false">
-       <span class="menu-toggle__icon" aria-hidden="true"></span>Overview
-     </button>`);
-  const toggleBtn = document.querySelector('.menu-toggle');
+  // The overview button: a small 3D cube, slowly turning, in the navigation bar
+  document.querySelector('.navbar').insertAdjacentHTML('beforeend', `
+    <button class="overview" type="button" aria-controls="menu" aria-expanded="false" aria-label="Overview of all works (Space)">
+      <span class="mini-cube" aria-hidden="true">
+        <i class="mini-cube__face mini-cube__face--front"></i>
+        <i class="mini-cube__face mini-cube__face--back"></i>
+        <i class="mini-cube__face mini-cube__face--left"></i>
+        <i class="mini-cube__face mini-cube__face--right"></i>
+        <i class="mini-cube__face mini-cube__face--top"></i>
+        <i class="mini-cube__face mini-cube__face--bottom"></i>
+      </span>
+      <span class="overview__hint" aria-hidden="true">Space · zoom out</span>
+    </button>`);
+  const toggleBtn = document.querySelector('.overview');
 
   // ---------- Open and close ----------
   let lastFocus = null;

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Axel af Ugglas — AI video work</title>
-  <meta name="description" content="Portfolio of Axel af Ugglas: AI video work and CV.">
+  <title>Axel af Ugglas — AI video & film</title>
+  <meta name="description" content="Portfolio of Axel af Ugglas: AI video & film, and CV.">
 
   <!-- Montserrat from Google Fonts: light, regular, medium and semibold -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,54 +19,43 @@
   <link rel="stylesheet" href="/css/field.css">
 </head>
 <body>
+  <!-- Background: the moving magnetic field, and the still image shown when effects are off -->
   <canvas id="fibres" aria-hidden="true"></canvas>
+  <div class="field-still" aria-hidden="true"></div>
 
   <header class="site-header">
-    <a class="logo" href="#home">Axel af Ugglas<span>AI video work</span></a>
-    <!-- Filled by JS: the magnetic field readout (field.js) and the Overview button (menu.js) -->
+    <a class="logo" href="#home">Axel af Ugglas<span>AI video &amp; film</span></a>
+    <!-- Filled by JS: the magnetic field readout (field.js) -->
     <div class="site-header__right"></div>
   </header>
 
   <!-- The cube: one column for Home, then one column per work (added by JS).
-       Each column holds "panels", read top to bottom. -->
+       Each column holds "panels" (the cube's faces), read top to bottom. -->
   <main id="cube" class="cube">
+    <div class="cube__box">
 
     <section class="column" id="home" data-title="Home">
 
-      <!-- Level 1: intro -->
+      <!-- Level 1: intro, a centred card with text and portrait -->
       <article class="panel" data-level="Intro">
         <div class="panel__inner intro">
-          <div class="intro__text">
-            <span class="label label--accent">Portfolio · AI video</span>
-            <h1>Axel<br>af Ugglas</h1>
-            <!-- Placeholder text: Axel replaces this with his own intro -->
-            <p class="lead">
-              Digital project manager and AI video maker. I turn ideas into
-              cinematic short films with AI-assisted workflows, and I like
-              building the tools and processes around them.
-            </p>
-          </div>
-
-          <figure class="intro__image">
-            <!-- Placeholder: swap for <img src="/img/axel.jpg" alt="Portrait of Axel af Ugglas"> -->
-            <div class="portrait-placeholder" role="img" aria-label="Placeholder for a portrait of Axel">
-              <span class="label">Portrait</span>
+          <div class="intro__card">
+            <div class="intro__text">
+              <span class="label label--accent">AI video &amp; film</span>
+              <h1>Axel af Ugglas</h1>
+              <!-- Placeholder text: Axel replaces this with his own intro -->
+              <p class="lead">
+                Digital project manager and AI video maker. I turn ideas into
+                cinematic short films with AI-assisted workflows, and I like
+                building the tools and processes around them.
+              </p>
             </div>
-          </figure>
-
-          <div class="intro__hint">
-            <!-- Arrow-key hint on desktop, swipe hint on touch screens -->
-            <div class="keys" aria-hidden="true">
-              <span class="key key--up">↑</span>
-              <span class="key key--left">←</span>
-              <span class="key key--down">↓</span>
-              <span class="key key--right">→</span>
-            </div>
-            <p class="hint-text label">
-              <span class="hint--keys">Use the arrow keys to explore</span>
-              <span class="hint--touch">Swipe to explore</span>
-            </p>
-            <a class="btn" href="#work" data-action="browse">Browse my work →</a>
+            <figure class="intro__image">
+              <!-- Placeholder: swap for <img src="/img/axel.jpg" alt="Portrait of Axel af Ugglas"> -->
+              <div class="portrait-placeholder" role="img" aria-label="Placeholder for a portrait of Axel">
+                <span class="label">Portrait</span>
+              </div>
+            </figure>
           </div>
         </div>
       </article>
@@ -212,9 +201,17 @@
       </article>
     </section>
 
+    </div>
   </main>
 
-  <script src="/js/fibres.js"></script>
+  <!-- Green particles thrown off the cube's edges when it turns (particles.js) -->
+  <canvas id="particles" aria-hidden="true"></canvas>
+
+  <!-- Bottom centre: where you are (dots), which way you can go (arrows), and the overview cube.
+       Filled by cube.js and menu.js -->
+  <nav class="navbar" aria-label="Move around the site"></nav>
+
+  <script src="/js/magnetic.js"></script>
   <script type="module" src="/js/app.js"></script>
 </body>
 </html>

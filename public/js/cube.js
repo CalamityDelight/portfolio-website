@@ -1,35 +1,39 @@
 // Cube navigation. The site is a grid of panels: columns (Home, then one per
-// work) and levels (the panels inside a column). Only one panel shows at a time.
-// Left/right switches column and always lands at the top; up/down moves level.
+// work) and levels (the panels inside a column). Each panel is a face of a cube,
+// and only one face shows at a time. Moving turns the cube 90° in 3D:
+// left/right switches column (always landing at the top), up/down changes level.
 
-const DURATION = 700; // ms, must match the animation length in cube.css
+const DURATION = 950; // ms for one turn of the cube
 
-export function initCube(cube) {
+export function initCube(cube, { particles } = {}) {
+  const box = cube.querySelector('.cube__box');
   const columns = [...cube.querySelectorAll('.column')];
   const grid = columns.map((col) => [...col.querySelectorAll('.panel')]);
   const state = { col: 0, level: 0, busy: false };
+  const root = document.documentElement;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  document.documentElement.classList.add('cube-ready');
+  root.classList.add('cube-ready');
 
   // Panels can take focus (without showing an outline) so screen readers and Tab follow along
   grid.flat().forEach((panel) => panel.setAttribute('tabindex', '-1'));
 
-  // ---------- On-screen arrows and dot indicator ----------
-  document.body.insertAdjacentHTML('beforeend', `
-    <nav class="arrows" aria-label="Move around the site">
+  // ---------- Navigation bar: dots (where you are) and arrows (where you can go) ----------
+  const navbar = document.querySelector('.navbar');
+  navbar.insertAdjacentHTML('beforeend', `
+    <div class="dots" aria-hidden="true">
+      ${grid.map((panels) => `<span class="dots__col">${panels.map(() => '<i></i>').join('')}</span>`).join('')}
+    </div>
+    <div class="arrows is-hint">
       <button class="arrow arrow--up" data-dir="up" aria-label="Up">↑</button>
       <button class="arrow arrow--left" data-dir="left" aria-label="Previous column">←</button>
       <button class="arrow arrow--down" data-dir="down" aria-label="Down">↓</button>
       <button class="arrow arrow--right" data-dir="right" aria-label="Next column">→</button>
-    </nav>
-    <div class="dots" aria-hidden="true">
-      ${grid.map((panels) => `
-        <span class="dots__col">${panels.map(() => '<i></i>').join('')}</span>`).join('')}
     </div>
     <p class="sr-only" aria-live="polite" id="cube-status"></p>`);
 
-  const arrows = document.querySelector('.arrows');
-  const dotCols = [...document.querySelectorAll('.dots__col')];
+  const arrows = navbar.querySelector('.arrows');
+  const dotCols = [...navbar.querySelectorAll('.dots__col')];
   const status = document.getElementById('cube-status');
 
   arrows.addEventListener('click', (e) => {
@@ -37,8 +41,18 @@ export function initCube(cube) {
     if (btn) step(btn.dataset.dir);
   });
 
-  // Only show arrows that lead somewhere (scrolling a tall panel counts)
+  // The arrows blink as a hint until the visitor's first move; after that
+  // they show only the directions that lead somewhere
+  let hinting = true;
+  function stopHint() {
+    if (!hinting) return;
+    hinting = false;
+    arrows.classList.remove('is-hint');
+    updateArrows();
+  }
+
   function updateArrows() {
+    if (hinting) return;
     const { col, level } = state;
     const panel = grid[col][level];
     arrows.querySelector('.arrow--left').hidden = col === 0;
@@ -62,38 +76,73 @@ export function initCube(cube) {
     });
 
     // Tell screen readers where we are, and keep the place in the URL so a refresh stays put
-    const panel = grid[col][level];
-    status.textContent = `${columns[col].dataset.title}: ${panel.dataset.level}`;
+    status.textContent = `${columns[col].dataset.title}: ${grid[col][level].dataset.level}`;
     history.replaceState(null, '', `#${columns[col].id}${level ? '/' + level : ''}`);
   }
 
-  // ---------- Moving ----------
+  // ---------- Turning the cube ----------
+  // The trick: put the next face on the side of the cube it should come from
+  // (to the right, below…), then rotate the whole box 90° so that side faces us.
+  // Afterwards everything is reset, with the new face simply flat in front.
 
-  // dir says which way the old panel leaves, so the animation rolls the right way
+  // Where the next face waits, and how the box turns to bring it to the front
+  const SIDES = {
+    right: { place: 'rotateY(90deg)', turn: 'rotateY(-90deg)' },
+    left: { place: 'rotateY(-90deg)', turn: 'rotateY(90deg)' },
+    down: { place: 'rotateX(-90deg)', turn: 'rotateX(90deg)' },
+    up: { place: 'rotateX(90deg)', turn: 'rotateX(-90deg)' },
+  };
+
   function go(col, level, dir) {
     if (state.busy) return;
     if (col === state.col && level === state.level) return;
     const from = grid[state.col][state.level];
     const to = grid[col][level];
 
-    // Stop any video in the panel we leave
-    from.querySelectorAll('video').forEach((v) => v.pause());
-
+    from.querySelectorAll('video').forEach((v) => v.pause()); // stop any video we leave
     to.scrollTop = 0; // always land at the top
-    to.classList.add('is-active', `enter-${dir}`);
-    from.classList.add(`exit-${dir}`);
-    to.focus({ preventScroll: true });
-
-    state.busy = true;
-    setTimeout(() => {
-      from.classList.remove('is-active', `exit-${dir}`);
-      to.classList.remove(`enter-${dir}`);
-      state.busy = false;
-    }, DURATION);
-
     state.col = col;
     state.level = level;
+    stopHint();
     updateUI();
+
+    if (reducedMotion) {
+      from.classList.remove('is-active');
+      to.classList.add('is-active');
+      to.focus({ preventScroll: true });
+      return;
+    }
+
+    // Half the cube's width (or height): how far each face sits from its centre
+    const horizontal = dir === 'left' || dir === 'right';
+    const depth = (horizontal ? box.clientWidth : box.clientHeight) / 2;
+    const { place, turn } = SIDES[dir];
+
+    particles?.burst(box.getBoundingClientRect(), dir, DURATION);
+
+    from.style.transform = `translateZ(${depth}px)`;
+    to.style.transform = `${place} translateZ(${depth}px)`;
+    to.classList.add('is-active');
+
+    box.style.transition = 'none';
+    box.style.transform = `translateZ(${-depth}px)`;
+    box.getBoundingClientRect(); // make the browser apply the start position before animating
+    box.style.transition = `transform ${DURATION}ms cubic-bezier(0.65, 0, 0.35, 1)`;
+    box.style.transform = `translateZ(${-depth}px) ${turn}`;
+
+    root.classList.add('is-turning');
+    to.focus({ preventScroll: true });
+    state.busy = true;
+
+    setTimeout(() => {
+      box.style.transition = 'none';
+      box.style.transform = '';
+      from.style.transform = '';
+      to.style.transform = '';
+      from.classList.remove('is-active');
+      root.classList.remove('is-turning');
+      state.busy = false;
+    }, DURATION);
   }
 
   function move(dir) {
@@ -104,14 +153,14 @@ export function initCube(cube) {
     if (dir === 'up' && level > 0) go(col, level - 1, 'up');
   }
 
-  // A tall panel (like the CV) scrolls first; only at its edge do we change level
+  // A tall face (like the CV) scrolls first; only at its edge do we change level
   function canScroll(panel, dir) {
     if (dir === 'down') return panel.scrollTop + panel.clientHeight < panel.scrollHeight - 2;
     return panel.scrollTop > 2;
   }
 
-  // One step in a direction: a tall panel scrolls first, then we move on
   function step(dir) {
+    stopHint();
     const panel = grid[state.col][state.level];
     if ((dir === 'up' || dir === 'down') && canScroll(panel, dir)) {
       panel.scrollBy({ top: (dir === 'down' ? 1 : -1) * panel.clientHeight * 0.8, behavior: 'smooth' });
@@ -119,6 +168,8 @@ export function initCube(cube) {
       move(dir);
     }
   }
+
+  const menuOpen = () => root.classList.contains('menu-open');
 
   // ---------- Keyboard ----------
   const keyDirs = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
@@ -128,12 +179,12 @@ export function initCube(cube) {
     if (!dir) return;
     // Leave arrow keys alone while typing or using a slider
     if (e.target.closest('input, textarea, select, [contenteditable]')) return;
-    if (document.documentElement.classList.contains('menu-open')) return;
+    if (menuOpen()) return;
     e.preventDefault();
     step(dir);
   });
 
-  // ---------- Swipe ----------
+  // ---------- Swipe (phones and tablets) ----------
   let touch = null;
 
   cube.addEventListener('touchstart', (e) => {
@@ -142,7 +193,7 @@ export function initCube(cube) {
     touch = {
       x: e.touches[0].clientX,
       y: e.touches[0].clientY,
-      // Remember if the panel was already at an edge when the swipe began,
+      // Remember if the face was already at an edge when the swipe began,
       // so a normal scroll to the bottom doesn't also jump a level
       atTop: !canScroll(panel, 'up'),
       atBottom: !canScroll(panel, 'down'),
@@ -161,6 +212,46 @@ export function initCube(cube) {
     }
     touch = null;
   });
+
+  // ---------- Two-finger swipe on a laptop trackpad (and the mouse wheel) ----------
+  // A trackpad swipe arrives as many small "wheel" events, and keeps coming for a
+  // while after the fingers lift (momentum). Events less than 250 ms apart count as
+  // one gesture, and one gesture moves the cube at most once.
+  let gesture = { lastEvent: 0, x: 0, y: 0, used: false, atTop: true, atBottom: true };
+
+  cube.addEventListener('wheel', (e) => {
+    if (menuOpen()) return;
+    const now = performance.now();
+    const panel = grid[state.col][state.level];
+    if (now - gesture.lastEvent > 250) {
+      gesture = { x: 0, y: 0, used: false, atTop: !canScroll(panel, 'up'), atBottom: !canScroll(panel, 'down') };
+    }
+    gesture.lastEvent = now;
+
+    // Sideways: always turns the cube
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+      e.preventDefault();
+      if (gesture.used || state.busy) return;
+      gesture.x += e.deltaX;
+      if (Math.abs(gesture.x) > 50) {
+        gesture.used = true;
+        move(gesture.x > 0 ? 'right' : 'left');
+      }
+      return;
+    }
+
+    // Up and down: the face scrolls normally; past its edge, the cube turns
+    if (gesture.used || state.busy) { e.preventDefault(); return; }
+    const dir = e.deltaY > 0 ? 'down' : 'up';
+    if (canScroll(panel, dir)) return;
+    if ((dir === 'down' && !gesture.atBottom) || (dir === 'up' && !gesture.atTop)) return;
+    e.preventDefault();
+    gesture.y += e.deltaY;
+    if (Math.abs(gesture.y) > 60) {
+      gesture.used = true;
+      move(dir);
+    }
+  }, { passive: false });
 
   // ---------- Links into the cube ----------
 
@@ -185,16 +276,9 @@ export function initCube(cube) {
     go(col, level, col >= state.col ? 'right' : 'left');
   });
 
-  document.querySelectorAll('[data-action="browse"]').forEach((btn) =>
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (columns.length > 1) go(1, 0, 'right');
-    })
-  );
-
   // Other parts (the zoom-out menu) move the cube through this
   return {
-    // targetId (optional): an element inside the panel to scroll to and highlight,
+    // targetId (optional): an element inside the face to scroll to and highlight,
     // used by the filter's "Read more" to land on the exact paragraph
     goTo(col, level = 0, targetId = null) {
       if (col === state.col) go(col, level, level >= state.level ? 'down' : 'up');

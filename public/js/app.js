@@ -6,6 +6,7 @@ import { initMenu } from './menu.js';
 import { initAccount } from './account.js';
 import { initComments } from './comments.js';
 import { initField } from './field.js';
+import { createParticles } from './particles.js';
 
 const cube = document.getElementById('cube');
 
@@ -21,13 +22,14 @@ try {
   ]);
 } catch {
   // Database or network down: Home and the CV still work, with a short note on the intro
-  document.querySelector('.intro__hint').insertAdjacentHTML('beforeend',
+  document.querySelector('.intro__text').insertAdjacentHTML('beforeend',
     '<p class="label">The works could not be loaded right now. Please try again later.</p>');
 }
-renderWorks(works, cube);
+renderWorks(works, cube.querySelector('.cube__box'));
 cube.querySelectorAll('.player').forEach(setupPlayer);
 initComments(cube);
 
-const nav = initCube(cube);
+const particles = createParticles(document.getElementById('particles'));
+const nav = initCube(cube, { particles });
 initMenu(nav, works, tags);
 initAccount();

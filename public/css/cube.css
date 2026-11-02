@@ -1,106 +1,156 @@
-/* Cube navigation. Only applies once cube.js has run (html.cube-ready),
-   so without JavaScript the site is still one long readable page. */
+/* The cube. Only applies once cube.js has run (html.cube-ready), so without
+   JavaScript the site is still one long readable page.
+
+   Every panel is a face of the cube. The cube fills most of the screen, between
+   the header and the navigation bar, with the magnetic field all around it. */
+
+:root {
+  --header-h: 4.5rem;
+  --navbar-h: 5.5rem;
+}
 
 .cube-ready body { overflow: hidden; }
 
 .cube-ready .cube {
   position: fixed;
   inset: 0;
-  perspective: 1600px;          /* gives the roller rotation its depth */
+  perspective: 2400px;          /* how deep the 3D turn looks: lower = more dramatic */
 }
 
-/* Every panel fills the screen, stacked on top of each other; only the active one shows */
+/* The box that turns. cube.js rotates it in 3D during a move. */
+.cube-ready .cube__box {
+  position: absolute;
+  top: var(--header-h);
+  bottom: var(--navbar-h);
+  left: 6vw;
+  right: 6vw;
+  transform-style: preserve-3d;
+}
+.cube-ready .column {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
 .cube-ready .panel {
   position: absolute;
   inset: 0;
-  overflow-y: auto;             /* tall panels like the CV scroll inside themselves */
+  min-height: 0;
+  overflow-y: auto;             /* tall faces like the CV scroll inside themselves */
   overscroll-behavior: contain;
   touch-action: pan-y;          /* horizontal swipes are ours, vertical ones scroll */
+  container-type: size;         /* lets content size itself to the face (cqh units) */
   visibility: hidden;
   backface-visibility: hidden;
+  background:
+    radial-gradient(ellipse at 15% 0%, rgba(123, 77, 255, 0.1), transparent 55%),
+    var(--face);
+  border: 1px solid rgba(198, 255, 26, 0.16);
+  box-shadow:
+    0 0 30px rgba(198, 255, 26, 0.05),
+    inset 0 0 60px rgba(123, 77, 255, 0.06),
+    0 40px 120px rgba(0, 0, 0, 0.7);
   scrollbar-width: thin;
   scrollbar-color: var(--purple-dim) transparent;
 }
 .cube-ready .panel.is-active { visibility: visible; }
 .cube-ready .panel:focus { outline: none; }
-.cube-ready .panel__inner { padding-bottom: var(--space-6); } /* room for the arrows and dots */
 
-/* ---------- Roller transitions ----------
-   The old panel rolls away and the new one rolls in from the opposite side,
-   a small turn plus a slide, like the face of a cube turning. */
-.enter-down  { animation: from-below 0.7s var(--ease) both; }
-.exit-down   { animation: to-above   0.7s var(--ease) both; }
-.enter-up    { animation: from-above 0.7s var(--ease) both; }
-.exit-up     { animation: to-below   0.7s var(--ease) both; }
-.enter-right { animation: from-right 0.7s var(--ease) both; }
-.exit-right  { animation: to-left    0.7s var(--ease) both; }
-.enter-left  { animation: from-left  0.7s var(--ease) both; }
-.exit-left   { animation: to-right   0.7s var(--ease) both; }
+/* While turning, the cube's edges light up like neon tubes */
+.cube-ready.is-turning .panel {
+  border-color: rgba(198, 255, 26, 0.55);
+  box-shadow: 0 0 40px rgba(198, 255, 26, 0.18), inset 0 0 40px rgba(198, 255, 26, 0.06);
+}
 
-@keyframes from-below { from { opacity: 0; transform: translateY(35%) rotateX(-14deg); } }
-@keyframes to-above   { to   { opacity: 0; transform: translateY(-35%) rotateX(14deg); } }
-@keyframes from-above { from { opacity: 0; transform: translateY(-35%) rotateX(14deg); } }
-@keyframes to-below   { to   { opacity: 0; transform: translateY(35%) rotateX(-14deg); } }
-@keyframes from-right { from { opacity: 0; transform: translateX(35%) rotateY(14deg); } }
-@keyframes to-left    { to   { opacity: 0; transform: translateX(-35%) rotateY(-14deg); } }
-@keyframes from-left  { from { opacity: 0; transform: translateX(-35%) rotateY(-14deg); } }
-@keyframes to-right   { to   { opacity: 0; transform: translateX(35%) rotateY(14deg); } }
+.cube-ready .panel__inner { min-height: 100%; }
 
-/* ---------- On-screen arrows ----------
-   Laid out like the arrow keys, bottom right, echoing the hint on the intro */
-.arrows {
+/* The green particles canvas sits over the cube, under the header and navbar */
+#particles {
   position: fixed;
-  right: var(--space-4);
-  bottom: var(--space-3);
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 15;
+  pointer-events: none;
+}
+
+/* ---------- Navigation bar: dots, arrows, overview cube ---------- */
+.navbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--navbar-h);
   z-index: 20;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-4);
+}
+.cube-ready .navbar { display: flex; }
+
+/* Arrow keys, laid out like a keyboard */
+.arrows {
   display: grid;
-  grid-template-columns: repeat(3, 2.2rem);
-  grid-template-rows: repeat(2, 2.2rem);
+  grid-template-columns: repeat(3, 1.9rem);
+  grid-template-rows: repeat(2, 1.9rem);
   gap: 4px;
 }
 .arrow {
   display: grid;
   place-items: center;
-  border: 1px solid rgba(198, 255, 26, 0.45);
-  border-radius: 6px;
-  background: rgba(10, 6, 17, 0.5);
+  border: 1px solid rgba(198, 255, 26, 0.55);
+  border-radius: 5px;
+  background: rgba(7, 4, 13, 0.6);
   color: var(--green);
   font: inherit;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   cursor: pointer;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  animation: neon-box 4.5s ease-in-out infinite;
+  transition: border-color 0.2s, opacity 0.3s;
 }
-.arrow:hover { border-color: var(--green); box-shadow: 0 0 12px var(--green-glow); }
+.arrow:hover { border-color: var(--green); box-shadow: 0 0 14px var(--green-glow); }
 .arrow[hidden] { display: grid; visibility: hidden; } /* keep the key layout steady */
 .arrow--up { grid-column: 2; grid-row: 1; }
 .arrow--left { grid-column: 1; grid-row: 2; }
 .arrow--down { grid-column: 2; grid-row: 2; }
 .arrow--right { grid-column: 3; grid-row: 2; }
 
-/* ---------- Dot indicator ----------
-   One small stack of dots per column; the green dot is where you are */
+/* Before the first move, all four keys show and light up in turn,
+   telling the visitor "you can move like this" */
+.arrows.is-hint .arrow {
+  border-color: var(--line);
+  color: var(--text-muted);
+  animation: key-hint 3.2s ease-in-out infinite;
+}
+.arrows.is-hint .arrow--up { animation-delay: 0s; }
+.arrows.is-hint .arrow--right { animation-delay: 0.8s; }
+.arrows.is-hint .arrow--down { animation-delay: 1.6s; }
+.arrows.is-hint .arrow--left { animation-delay: 2.4s; }
+@keyframes key-hint {
+  0%, 30%, 100% { border-color: var(--line); color: var(--text-muted); box-shadow: none; }
+  10%, 18% { border-color: var(--green); color: var(--green); box-shadow: 0 0 12px var(--green-glow); }
+}
+
+/* Dot indicator: one small stack per column; the green dot is where you are */
 .dots {
-  position: fixed;
-  left: var(--space-4);
-  bottom: var(--space-3);
-  z-index: 20;
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  pointer-events: none;
+  gap: 7px;
 }
-.dots__col { display: flex; flex-direction: column; gap: 5px; opacity: 0.45; transition: opacity 0.3s; }
+.dots__col { display: flex; flex-direction: column; gap: 4px; opacity: 0.4; transition: opacity 0.3s; }
 .dots__col.is-current { opacity: 1; }
 .dots i {
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
   background: var(--text-muted);
   transition: background 0.3s, box-shadow 0.3s;
 }
-.dots i.is-active { background: var(--green); box-shadow: 0 0 8px var(--green-glow); }
+.dots i.is-active { background: var(--green); box-shadow: 0 0 8px var(--green); }
 
 @media (max-width: 700px) {
-  .arrows { right: var(--space-2); bottom: var(--space-2); grid-template-columns: repeat(3, 2rem); grid-template-rows: repeat(2, 2rem); }
-  .dots { left: var(--space-3); bottom: var(--space-2); }
+  :root { --header-h: 4rem; --navbar-h: 5rem; }
+  .cube-ready .cube__box { left: 3vw; right: 3vw; }
+  .navbar { gap: var(--space-3); }
 }

@@ -6,9 +6,9 @@
   opacity: 0.25;
   filter: blur(2px);
 }
-.menu-open .arrows,
-.menu-open .dots { opacity: 0; pointer-events: none; }
-.arrows, .dots { transition: opacity 0.4s; }
+.menu-open .navbar,
+.menu-open #particles { opacity: 0; pointer-events: none; }
+.navbar { transition: opacity 0.4s; }
 
 .menu {
   position: fixed;
@@ -143,18 +143,54 @@ mark { background: rgba(198, 255, 26, 0.18); color: var(--text); padding: 0 0.15
 .map__level:hover { border-color: var(--green); color: var(--text); }
 .map__level.is-here { border-color: var(--green); color: var(--green); box-shadow: 0 0 10px var(--green-glow); }
 
-/* ---------- Overview button in the header ---------- */
-.btn--quiet { border-color: rgba(198, 255, 26, 0.5); }
-.menu-toggle__icon {
-  width: 10px;
-  height: 10px;
-  /* tiny 2×2 grid: the cube map */
-  background:
-    linear-gradient(currentColor, currentColor) 0 0 / 4px 4px no-repeat,
-    linear-gradient(currentColor, currentColor) 100% 0 / 4px 4px no-repeat,
-    linear-gradient(currentColor, currentColor) 0 100% / 4px 4px no-repeat,
-    linear-gradient(currentColor, currentColor) 100% 100% / 4px 4px no-repeat;
+/* ---------- Overview button: a small neon cube, slowly swaying ---------- */
+.overview {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.4rem;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  cursor: pointer;
+  perspective: 160px;
 }
+.overview__hint {
+  font-size: 0.625rem;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+.overview:hover .overview__hint { color: var(--green); }
+
+.mini-cube {
+  --s: 22px;
+  position: relative;
+  width: var(--s);
+  height: var(--s);
+  transform-style: preserve-3d;
+  animation: mini-sway 7s ease-in-out infinite alternate;
+}
+.overview:hover .mini-cube { animation-duration: 1.6s; }
+@keyframes mini-sway {
+  from { transform: rotateX(-24deg) rotateY(-35deg); }
+  to   { transform: rotateX(-16deg) rotateY(55deg); }
+}
+.mini-cube__face {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(198, 255, 26, 0.8);
+  background: rgba(198, 255, 26, 0.05);
+  box-shadow: 0 0 6px rgba(198, 255, 26, 0.35), inset 0 0 4px rgba(198, 255, 26, 0.25);
+}
+.mini-cube__face--front  { transform: translateZ(calc(var(--s) / 2)); }
+.mini-cube__face--back   { transform: rotateY(180deg) translateZ(calc(var(--s) / 2)); }
+.mini-cube__face--right  { transform: rotateY(90deg) translateZ(calc(var(--s) / 2)); }
+.mini-cube__face--left   { transform: rotateY(-90deg) translateZ(calc(var(--s) / 2)); }
+.mini-cube__face--top    { transform: rotateX(90deg) translateZ(calc(var(--s) / 2)); }
+.mini-cube__face--bottom { transform: rotateX(-90deg) translateZ(calc(var(--s) / 2)); }
 
 @media (max-width: 700px) {
   .menu__inner { padding: 6rem var(--space-3) var(--space-4); }
