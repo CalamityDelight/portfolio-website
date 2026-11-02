@@ -44,6 +44,13 @@
   transition: background 0.4s, border-color 0.4s, box-shadow 0.4s;
   scrollbar-width: thin;
   scrollbar-color: var(--purple-dim) transparent;
+  /* Content dissolves into the dark near the header and the navigation bar,
+     so scrolling text never collides with them (no background box needed) */
+  --fade: linear-gradient(
+    transparent calc(var(--header-h) - 1.5rem), #000 calc(var(--header-h) + 1rem),
+    #000 calc(100% - var(--navbar-h) - 2.5rem), transparent calc(100% - var(--navbar-h) + 0.5rem));
+  -webkit-mask-image: var(--fade);
+  mask-image: var(--fade);
 }
 .cube-ready .panel.is-active { visibility: visible; }
 .cube-ready .panel:focus { outline: none; }
@@ -91,24 +98,23 @@
 /* Arrow keys, laid out like a keyboard */
 .arrows {
   display: grid;
-  grid-template-columns: repeat(3, 1.9rem);
-  grid-template-rows: repeat(2, 1.9rem);
-  gap: 4px;
+  grid-template-columns: repeat(3, 1.6rem);
+  grid-template-rows: repeat(2, 1.6rem);
+  gap: 2px;
 }
 .arrow {
   display: grid;
   place-items: center;
-  border: 1px solid rgba(94, 240, 196, 0.55);
-  border-radius: 5px;
-  background: rgba(7, 4, 13, 0.6);
+  border: 0;
+  background: none;
   color: var(--glow);
   font: inherit;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   cursor: pointer;
-  animation: neon-box 4.5s ease-in-out infinite;
-  transition: border-color 0.2s, opacity 0.3s;
+  text-shadow: 0 0 8px var(--glow-soft);
+  transition: color 0.2s, text-shadow 0.2s, transform 0.2s;
 }
-.arrow:hover { border-color: var(--glow); box-shadow: 0 0 14px var(--glow-soft); }
+.arrow:hover { color: var(--mint); text-shadow: 0 0 14px var(--glow); transform: scale(1.15); }
 .arrow[hidden] { display: grid; visibility: hidden; } /* keep the key layout steady */
 .arrow--up { grid-column: 2; grid-row: 1; }
 .arrow--left { grid-column: 1; grid-row: 2; }
@@ -118,8 +124,8 @@
 /* Before the first move, all four keys show and light up in turn,
    telling the visitor "you can move like this" */
 .arrows.is-hint .arrow {
-  border-color: var(--line);
   color: var(--text-muted);
+  text-shadow: none;
   animation: key-hint 3.2s ease-in-out infinite;
 }
 .arrows.is-hint .arrow--up { animation-delay: 0s; }
@@ -127,8 +133,8 @@
 .arrows.is-hint .arrow--down { animation-delay: 1.6s; }
 .arrows.is-hint .arrow--left { animation-delay: 2.4s; }
 @keyframes key-hint {
-  0%, 30%, 100% { border-color: var(--line); color: var(--text-muted); box-shadow: none; }
-  10%, 18% { border-color: var(--glow); color: var(--glow); box-shadow: 0 0 12px var(--glow-soft); }
+  0%, 30%, 100% { color: var(--text-muted); text-shadow: none; }
+  10%, 18% { color: var(--glow); text-shadow: 0 0 12px var(--glow); }
 }
 
 /* Dot indicator: one small stack per column; the glowing dot is where you are */

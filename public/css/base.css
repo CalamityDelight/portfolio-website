@@ -2,7 +2,7 @@
    so the whole look can be tuned from one place. */
 :root {
   /* Colours: dark mystic purple, with turquoise that glows like bioluminescence */
-  --bg: #0b0711;              /* near-black with a deep purple tint */
+  --bg: #07040b;              /* black with a faint purple tint */
   --bg-raised: #150d1f;
   --face: rgba(12, 7, 20, 0.6); /* the cube's faces while turning */
   --purple: #7a52d8;          /* the magnetic field and quiet details */
@@ -14,14 +14,14 @@
   --glow-soft: rgba(94, 240, 196, 0.35);
   --mint: #c4f8e2;            /* the palest glow, for small highlights */
 
-  /* Type: smaller and airier than before, body still a comfortable 16px (brief task 3) */
+  /* Type: small, crisp and airy like the reference; body 15px stays readable (brief task 3) */
   --font: 'Montserrat', system-ui, sans-serif;
-  --size-label: 0.6875rem;    /* 11px: small caps labels */
-  --size-body: 1rem;          /* 16px */
-  --size-lead: 1.125rem;
-  --size-h3: 0.85rem;
-  --size-h2: 1.15rem;
-  --size-h1: clamp(1.8rem, 3.2vw, 2.6rem);
+  --size-label: 0.625rem;     /* 10px: small caps labels */
+  --size-body: 0.9375rem;     /* 15px: small and crisp, still easy to read */
+  --size-lead: 1rem;
+  --size-h3: 0.75rem;
+  --size-h2: 0.95rem;
+  --size-h1: clamp(1.4rem, 2.4vw, 2rem);
   --track-title: 0.24em;      /* wide letter spacing for all-caps titles */
   --track-label: 0.2em;
 
@@ -33,7 +33,7 @@
   --space-5: 4rem;
   --space-6: 7rem;
 
-  --measure: 34rem;           /* max line length for body text */
+  --measure: 30rem;           /* max line length for body text */
   --radius-pill: 999px;
   --ease: cubic-bezier(0.65, 0, 0.35, 1);
 }
@@ -67,7 +67,7 @@ h1, h2, h3 {
   line-height: 1.25;
 }
 h1 { font-size: var(--size-h1); font-weight: 300; }
-h2 { font-size: var(--size-h2); font-weight: 300; }
+h2 { font-size: var(--size-h2); font-weight: 400; }
 h3 { font-size: var(--size-h3); font-weight: 500; }
 
 p { margin: 0 0 var(--space-2); max-width: var(--measure); }
@@ -107,15 +107,15 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
   animation: neon-breathe 6s ease-in-out infinite;
 }
 
-/* Thin outlined pill button, glowing like neon */
+/* Thin rectangular outline button with a turquoise sheen */
 .btn {
   position: relative;
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  padding: 0.6em 1.5em;
-  border: 1px solid rgba(94, 240, 196, 0.7);
-  border-radius: var(--radius-pill);
+  padding: 0.7em 1.4em;
+  border: 1px solid rgba(94, 240, 196, 0.55);
+  border-radius: 1px;
   background: transparent;
   color: var(--glow);
   font: inherit;
@@ -134,7 +134,7 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
   inset: -1px;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(100deg, transparent 35%, rgba(205, 255, 236, 0.95) 50%, transparent 65%) 0 0 / 300% 100%;
+  background: linear-gradient(100deg, transparent 38%, rgba(205, 255, 236, 0.9) 50%, transparent 62%) 0 0 / 300% 100%;
   /* Show the gradient only on the 1px border ring */
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
@@ -145,9 +145,31 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
 .btn--quiet { border-color: rgba(94, 240, 196, 0.45); animation: none; }
 .btn--quiet::after { display: none; }
 .btn:hover {
-  background: var(--glow);
-  color: var(--bg);
+  background: rgba(94, 240, 196, 0.1);
   box-shadow: 0 0 22px var(--glow-soft);
+}
+
+/* A list of words with a small glowing dot before each: tags and skills, never boxed */
+.word-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.4rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+.word-list li::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 3px;
+  margin: 0 0.6em 0.2em 0;
+  border-radius: 50%;
+  background: var(--glow);
+  box-shadow: 0 0 6px var(--glow);
+  vertical-align: middle;
 }
 
 /* Visible keyboard focus everywhere, in the accent colour */

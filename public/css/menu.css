@@ -60,27 +60,27 @@
   text-transform: uppercase;
   letter-spacing: var(--track-title);
   cursor: pointer;
-  transition: color 0.2s;
+  transition: color 0.2s, text-shadow 0.2s;
 }
-.menu__text-nav button:hover { color: var(--glow); }
+.menu__text-nav button:hover { color: var(--glow); text-shadow: 0 0 10px var(--glow-soft); }
 
 /* ---------- Filter ---------- */
 .filter { margin-bottom: var(--space-5); }
 .filter h2 { margin-bottom: var(--space-2); }
-.filter__tags { display: flex; flex-wrap: wrap; gap: var(--space-1); }
+.filter__tags { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-3); }
 .filter__tag {
-  padding: 0.35em 1em;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
+  padding: 0.2em 0;
+  border: 0;
+  border-bottom: 1px solid transparent;
   background: none;
   color: var(--text-muted);
   font: inherit;
-  font-size: 0.9rem;
+  font-size: 0.8125rem;
   cursor: pointer;
   transition: color 0.2s, border-color 0.2s;
 }
-.filter__tag:hover { color: var(--text); border-color: var(--glow); }
-.filter__tag[aria-pressed="true"] { color: var(--glow); border-color: var(--glow); box-shadow: 0 0 10px var(--glow-soft); }
+.filter__tag:hover { color: var(--text); }
+.filter__tag[aria-pressed="true"] { color: var(--glow); border-bottom-color: var(--glow); text-shadow: 0 0 8px var(--glow-soft); }
 
 .filter__results:not(:empty) { margin-top: var(--space-4); }
 .filter__list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
@@ -103,10 +103,8 @@ mark { background: rgba(94, 240, 196, 0.18); color: var(--text); padding: 0 0.15
   gap: var(--space-2);
 }
 .map__col {
-  padding: var(--space-2);
-  border: 1px solid var(--line);
-  border-top: 1px solid rgba(94, 240, 196, 0.5);
-  background: rgba(18, 11, 30, 0.6);
+  padding: var(--space-2) 0 0;
+  border-top: 1px solid rgba(94, 240, 196, 0.25);
 }
 .map__title {
   display: block;
@@ -129,19 +127,19 @@ mark { background: rgba(94, 240, 196, 0.18); color: var(--text); padding: 0 0.15
 .map__levels { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
 .map__level {
   width: 100%;
-  padding: 0.45rem 0.7rem;
-  border: 1px solid var(--line);
-  border-radius: 4px;
+  padding: 0.3rem 0;
+  border: 0;
   background: none;
   color: var(--text-muted);
   font: inherit;
-  font-size: 0.85rem;
+  font-size: 0.8125rem;
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.2s, color 0.2s;
+  transition: color 0.2s;
 }
-.map__level:hover { border-color: var(--glow); color: var(--text); }
-.map__level.is-here { border-color: var(--glow); color: var(--glow); box-shadow: 0 0 10px var(--glow-soft); }
+.map__level:hover { color: var(--text); }
+.map__level.is-here { color: var(--glow); text-shadow: 0 0 8px var(--glow-soft); }
+.map__level.is-here::before { content: '— '; }
 
 /* ---------- Overview button: a small neon cube, slowly swaying ---------- */
 .overview {

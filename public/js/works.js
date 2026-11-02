@@ -49,7 +49,7 @@ function parseSummary(summary) {
   return result;
 }
 
-const pills = (items) => `<ul class="tag-list">${items.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>`;
+const pills = (items) => `<ul class="word-list">${items.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>`;
 
 // Level 2: AI summary, shown as a designed card rather than plain text
 function summaryPanel(work) {

@@ -16,9 +16,9 @@
 .kp__line { width: 56px; height: 16px; }
 
 .kp__toggle {
-  padding: 0.3em 0.9em;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
+  padding: 0.2em 0;
+  border: 0;
+  border-bottom: 1px solid rgba(94, 240, 196, 0.35);
   background: none;
   color: var(--text-muted);
   font: inherit;
@@ -59,6 +59,6 @@
   }
   .kp__text { grid-area: text; font-size: 0.625rem; }
   .kp__line { grid-area: line; width: 44px; }
-  .kp__toggle { grid-area: toggle; padding: 0.25em 0.7em; font-size: 0.5625rem; letter-spacing: 0.12em; }
+  .kp__toggle { grid-area: toggle; font-size: 0.5625rem; letter-spacing: 0.12em; }
   .logo { white-space: nowrap; }
 }
