@@ -8,3 +8,7 @@ node_modules/
 .DS_Store
 .vscode/
 *.log
+
+# AI agent tooling (Neon skills), not part of the site
+.claude/
+skills-lock.json
