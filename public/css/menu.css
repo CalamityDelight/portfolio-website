@@ -1,0 +1,135 @@
+/* Zoom-out menu: the cube shrinks back and the flat map fades in over it */
+
+.cube { transition: transform 0.6s var(--ease), opacity 0.6s var(--ease), filter 0.6s; }
+.menu-open .cube {
+  transform: scale(0.86);
+  opacity: 0.25;
+  filter: blur(2px);
+}
+.menu-open .arrows,
+.menu-open .dots { opacity: 0; pointer-events: none; }
+.arrows, .dots { transition: opacity 0.4s; }
+
+.menu {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  overflow-y: auto;
+  background: rgba(10, 6, 17, 0.55);
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(1.06);
+  transition: opacity 0.5s var(--ease), transform 0.5s var(--ease), visibility 0s 0.5s;
+}
+.menu-open .menu {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 0.5s var(--ease) 0.1s, transform 0.5s var(--ease) 0.1s;
+}
+
+.menu__inner {
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4) var(--space-5);
+}
+.menu__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+}
+
+/* Text navigation above the map */
+.menu__text-nav {
+  list-style: none;
+  margin: 0 0 var(--space-5);
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+}
+.menu__text-nav button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: var(--size-h2);
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: var(--track-title);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.menu__text-nav button:hover { color: var(--green); }
+
+/* ---------- The unfolded cube ----------
+   Columns side by side, like the faces of the cube laid flat */
+.map {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: var(--space-2);
+}
+.map__col {
+  padding: var(--space-2);
+  border: 1px solid var(--line);
+  border-top: 1px solid rgba(198, 255, 26, 0.5);
+  background: rgba(18, 11, 30, 0.6);
+}
+.map__title {
+  display: block;
+  width: 100%;
+  padding: 0 0 var(--space-2);
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  text-align: left;
+  cursor: pointer;
+}
+.map__title .label { display: block; margin-bottom: 0.25rem; }
+.map__title:hover { color: var(--green); }
+
+.map__levels { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.map__level {
+  width: 100%;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+.map__level:hover { border-color: var(--green); color: var(--text); }
+.map__level.is-here { border-color: var(--green); color: var(--green); box-shadow: 0 0 10px var(--green-glow); }
+
+/* ---------- Overview button in the header ---------- */
+.btn--quiet { border-color: rgba(198, 255, 26, 0.5); }
+.menu-toggle__icon {
+  width: 10px;
+  height: 10px;
+  /* tiny 2×2 grid: the cube map */
+  background:
+    linear-gradient(currentColor, currentColor) 0 0 / 4px 4px no-repeat,
+    linear-gradient(currentColor, currentColor) 100% 0 / 4px 4px no-repeat,
+    linear-gradient(currentColor, currentColor) 0 100% / 4px 4px no-repeat,
+    linear-gradient(currentColor, currentColor) 100% 100% / 4px 4px no-repeat;
+}
+
+@media (max-width: 700px) {
+  .menu__inner { padding: 6rem var(--space-3) var(--space-4); }
+  .menu__text-nav button { font-size: var(--size-h3); }
+  .map { grid-template-columns: repeat(2, 1fr); }
+}

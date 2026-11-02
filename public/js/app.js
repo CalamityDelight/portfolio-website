@@ -2,6 +2,7 @@
 import { loadWorks, renderWorks } from './works.js';
 import { setupPlayer } from './player.js';
 import { initCube } from './cube.js';
+import { initMenu } from './menu.js';
 
 const cube = document.getElementById('cube');
 
@@ -10,3 +11,4 @@ renderWorks(works, cube);
 cube.querySelectorAll('.player').forEach(setupPlayer);
 
 const nav = initCube(cube);
+initMenu(nav);
