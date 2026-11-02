@@ -96,34 +96,33 @@ function referencesPanel(work) {
     </article>`;
 }
 
-// Level 5: comments. Static in Part 1; Part 2 saves them in Neon.
+// Level 5: comments. js/comments.js loads the list and handles the form.
 function commentsPanel(work) {
-  const f = work.slug;
+  const f = work.slug; // slugs only contain a-z, 0-9 and dashes, so they are safe in ids
   return `
     <article class="panel" data-level="Comments">
       <div class="panel__inner comments">
         <span class="label label--accent">Comments</span>
         <h2>Leave a comment</h2>
-        <ol class="comment-list">
-          <li class="muted">No comments yet.</li>
-        </ol>
-        <form class="comment-form" data-slug="${esc(f)}">
+        <ol class="comment-list" aria-live="polite"></ol>
+        <form class="comment-form" data-post-id="${esc(work.id)}" novalidate>
           <div class="field">
             <label for="${f}-first">First name</label>
-            <input id="${f}-first" name="first_name" required autocomplete="given-name">
+            <input id="${f}-first" name="first_name" required maxlength="80" autocomplete="given-name">
           </div>
           <div class="field">
             <label for="${f}-last">Last name</label>
-            <input id="${f}-last" name="last_name" required autocomplete="family-name">
+            <input id="${f}-last" name="last_name" required maxlength="80" autocomplete="family-name">
           </div>
           <div class="field field--wide">
-            <label for="${f}-email">Email</label>
-            <input id="${f}-email" name="email" type="email" required autocomplete="email">
+            <label for="${f}-email">Email <span class="field__note">· never shown</span></label>
+            <input id="${f}-email" name="email" type="email" required maxlength="200" autocomplete="email">
           </div>
           <div class="field field--wide">
             <label for="${f}-body">Comment</label>
-            <textarea id="${f}-body" name="body" rows="4" required></textarea>
+            <textarea id="${f}-body" name="body" rows="4" required maxlength="2000"></textarea>
           </div>
+          <p class="form-message field--wide" role="status"></p>
           <button class="btn" type="submit">Post comment</button>
         </form>
       </div>
@@ -140,9 +139,4 @@ export function renderWorks(works, cube) {
       ${commentsPanel(work)}
     </section>`).join('');
   cube.insertAdjacentHTML('beforeend', html);
-
-  // Part 1: the form is for show only, so stop it reloading the page
-  cube.querySelectorAll('.comment-form').forEach((form) => {
-    form.addEventListener('submit', (e) => e.preventDefault());
-  });
 }

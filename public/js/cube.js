@@ -48,6 +48,10 @@ export function initCube(cube) {
   }
   grid.flat().forEach((panel) => panel.addEventListener('scroll', updateArrows, { passive: true }));
 
+  // Content can grow after load (comments arrive, images load), so check again whenever a panel changes size
+  const resizeWatcher = new ResizeObserver(updateArrows);
+  grid.flat().forEach((panel) => resizeWatcher.observe(panel.firstElementChild));
+
   function updateUI() {
     const { col, level } = state;
     updateArrows();
