@@ -1,17 +1,18 @@
 // The living background. The still image (public/img/background.jpg) is always
-// there in CSS; when effects are on, this script draws the same image on a WebGL
-// canvas on top of it and gently moves its pixels:
+// there in CSS; this script draws the same image on a WebGL canvas on top of it
+// and brings it to life:
 //
-//  1. Turquoise flows: only the turquoise parts of the image drift slowly, like
-//     paint or vapour seeping through dark water.
-//  2. Magnetic field: barely visible dark purple field lines (the loops around a
-//     magnet) vibrate faster and harder as Earth's Kp index rises (set by field.js).
-//  3. Wind on water: near the pointer the image ripples faintly and the turquoise
-//     beneath the surface stirs.
-//  4. A click is a drop in water: a ripple spreads, turquoise paint seeps in, then fades.
+//  1. Vapour: turquoise tendrils, built from layered noise and shaped after the
+//     image, seep in from the edges and slowly draw back, like paint in dark water.
+//     The image's own turquoise drifts along with them. Earth's Kp index (from
+//     field.js) makes the flow a little faster in a disturbed field.
+//  2. Wind on water: under the pointer the surface ripples faintly and turquoise
+//     light shows through, in a small area.
+//  3. A click is a drop of paint: a ripple spreads and a tiny bloom of turquoise
+//     seeps out from that spot, then dissolves.
 //
-// WebGL runs a tiny program (a "shader") on the graphics card for every pixel,
-// which is what makes moving a full-screen image smooth. If WebGL isn't
+// WebGL runs a small program (a "shader") on the graphics card for every pixel,
+// which is what makes animating a full-screen image smooth. If WebGL isn't
 // available, the still image simply stays.
 
 (function () {
@@ -37,7 +38,7 @@
   const FRAGMENT = `
     precision highp float;
     uniform sampler2D uImage;
-    uniform vec2 uRes;        // canvas size in CSS pixels
+    uniform vec2 uRes;        // screen size in CSS pixels
     uniform vec2 uImageSize;
     uniform float uTime;      // seconds
     uniform float uKp;        // 0 = calm … 1 = extreme storm
@@ -73,51 +74,65 @@
       vec2 px = vUv * uRes;
       vec2 uv = cover(vUv);
       float t = uTime;
-      vec3 sea = vec3(0.10, 0.55, 0.42); // the turquoise we add
+      vec3 sea = vec3(0.12, 0.62, 0.48);      // the turquoise we paint with
+      vec3 deep = vec3(0.13, 0.07, 0.26);     // the purple swirls
 
-      // 3. Wind on water near the pointer
+      // Pointer: a small area of water it is touching
       vec2 toPointer = px - uPointer.xy;
-      float near = exp(-dot(toPointer, toPointer) / (230.0 * 230.0)) * uPointer.z;
-      vec2 shift = vec2(0.0);
-      if (near > 0.001) {
-        shift = (vec2(fbm(px * 0.01 + t * 0.6), fbm(px * 0.01 + 7.3 - t * 0.5)) - 0.5) * near * 0.012;
-      }
+      float near = exp(-dot(toPointer, toPointer) / (110.0 * 110.0)) * uPointer.z;
 
-      // 4. Drops: a ripple ring travels outwards, and turquoise paint seeps in
+      // Drops: a ripple ring travels outwards, and a tiny bloom of paint seeps out
+      vec2 shift = vec2(0.0);
       float ink = 0.0;
       for (int i = 0; i < 4; i++) {
         float age = t - uDrops[i].z;
-        if (age < 0.0 || age > 4.5) continue;
+        if (age < 0.0 || age > 4.0) continue;
         vec2 v = px - uDrops[i].xy;
         float r = length(v);
-        float front = age * 240.0;
-        float ring = exp(-pow((r - front) / 45.0, 2.0)) * exp(-age * 1.3);
-        shift += (v / (r + 0.001)) * sin((r - front) * 0.07) * ring * 0.005;
-        float edge = 40.0 + age * 70.0 + (fbm(v * 0.012 + age * 0.25) - 0.5) * 130.0; // uneven edge, like ink
-        ink += smoothstep(edge, edge - 90.0, r) * smoothstep(4.5, 1.0, age) * smoothstep(0.0, 0.5, age);
+        float front = age * 220.0;
+        float ring = exp(-pow((r - front) / 35.0, 2.0)) * exp(-age * 1.6);
+        shift += (v / (r + 0.001)) * sin((r - front) * 0.08) * ring * 0.004;
+        // the bloom grows to ~70px with a ragged, inky edge, then fades
+        float edge = 8.0 + 55.0 * (1.0 - exp(-age * 1.4)) + (fbm(v * 0.03 + age * 0.4) - 0.5) * 50.0;
+        // (1 - smoothstep) = "inside the edge" and "not yet faded"; smoothstep needs its edges in order
+        ink += (1.0 - smoothstep(edge - 30.0, edge, r)) * (1.0 - smoothstep(1.2, 4.0, age)) * smoothstep(0.0, 0.25, age);
+      }
+      if (near > 0.001) {
+        shift += (vec2(fbm(px * 0.012 + t * 0.7), fbm(px * 0.012 + 7.3 - t * 0.6)) - 0.5) * near * 0.01;
       }
 
-      // 1. Turquoise flows: read the image a little off to the side, following slow noise
-      float speed = 0.015 + 0.03 * uKp;
-      vec2 q = vec2(fbm(uv * 3.0 + vec2(0.0, t * speed)), fbm(uv * 3.0 + vec2(5.2, -t * speed)));
-      vec2 flow = (q - 0.5) * (0.03 + 0.03 * near); // a stronger pull under the pointer
+      // 1. The image, with its own turquoise drifting along a slow current
+      float speed = 0.03 + 0.04 * uKp;
+      vec2 p = uv * 2.6;
+      vec2 q = vec2(fbm(p + vec2(0.0, t * speed)), fbm(p + vec2(5.2, -t * speed)));
       vec3 still = texture2D(uImage, uv + shift).rgb;
-      vec3 moving = texture2D(uImage, uv + shift + flow).rgb;
+      vec3 moving = texture2D(uImage, uv + shift + (q - 0.5) * 0.06).rgb;
       vec3 color = mix(still, moving, max(turquoise(still), turquoise(moving)));
 
-      // The turquoise beneath the surface, glimpsed where the pointer stirs
-      color += sea * smoothstep(0.55, 0.85, fbm(px * 0.004 + t * 0.05)) * near * 0.14;
-      // Paint from a drop, with a cloudy texture
-      color += sea * clamp(ink, 0.0, 1.0) * smoothstep(0.35, 0.8, fbm(px * 0.012 + t * 0.15)) * 0.32;
+      // Vapour: noise folded into itself ("domain warping") gives curling tendrils.
+      // 1 - |2v - 1| turns soft clouds into thin filaments, like paint threads in water.
+      vec2 r2 = vec2(fbm(p * 1.4 + 4.0 * q + vec2(1.7, 9.2) + t * speed * 1.5),
+                     fbm(p * 1.4 + 4.0 * q + vec2(8.3, 2.8) - t * speed * 1.2));
+      float v = fbm(p * 1.4 + 3.5 * r2);
+      float filament = pow(1.0 - abs(2.0 * v - 1.0), 14.0) * smoothstep(0.35, 0.65, fbm(p * 0.9 - t * speed));
 
-      // 2. Magnetic field lines around an imaginary magnet in the middle of the screen.
-      // x² / r³ is constant along a magnet's field lines, so its contours draw the loops.
-      vec2 m = (vUv - 0.5) * vec2(uRes.x / uRes.y, 1.0);
-      float r2 = dot(m, m) + 0.02;
-      float field = (m.x * m.x) / pow(r2, 1.5);
-      float vibration = sin(t * (2.0 + 10.0 * uKp) + m.y * 18.0) * (0.01 + 0.04 * uKp);
-      float lines = smoothstep(0.93, 1.0, abs(sin((field + vibration) * 5.0)));
-      color += vec3(0.16, 0.07, 0.32) * lines * smoothstep(0.03, 0.15, r2) * (0.05 + 0.06 * uKp);
+      // The vapour lives near the edges, and its reach breathes in and out slowly
+      vec2 e = min(vUv, 1.0 - vUv);
+      float edgeDist = min(e.x * uRes.x / uRes.y, e.y);
+      float reach = 0.1 + 0.06 * sin(t * 0.12 + v * 6.0) + 0.04 * uKp;
+      float edgeMask = 1.0 - smoothstep(0.0, reach, edgeDist);
+      color += sea * filament * edgeMask * 0.45;
+      color += deep * pow(v, 3.0) * edgeMask * 0.35;
+
+      // 2. Turquoise stirred up just under the pointer: thin veins of light, not a flat glow
+      if (near > 0.001) {
+        float lv = fbm(px * 0.011 + vec2(t * 0.5, -t * 0.35));
+        float veins = pow(1.0 - abs(2.0 * lv - 1.0), 5.0);
+        color += sea * near * (0.05 + 0.75 * veins);
+      }
+
+      // 3. The paint from a drop, threaded like the vapour
+      color += sea * clamp(ink, 0.0, 1.0) * (0.5 + 0.9 * smoothstep(0.3, 0.8, fbm(px * 0.035 + t * 0.3)));
 
       gl_FragColor = vec4(color, 1.0);
     }`;
@@ -184,11 +199,12 @@
   };
   image.src = '/img/background.jpg';
 
-  // Drawing at 70% of the screen's pixels is plenty for a soft image and keeps it light
-  const SCALE = 0.7;
+  // Draw at the screen's real pixel density (Retina = 2 pixels per CSS pixel),
+  // so the image stays as sharp as the original
   function resize() {
-    canvas.width = Math.round(window.innerWidth * SCALE);
-    canvas.height = Math.round(window.innerHeight * SCALE);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(window.innerWidth * dpr);
+    canvas.height = Math.round(window.innerHeight * dpr);
     gl.viewport(0, 0, canvas.width, canvas.height);
   }
   window.addEventListener('resize', resize);
@@ -204,7 +220,7 @@
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     canvas.classList.add('is-live'); // fade the canvas in over the still image
 
-    pointer.energy *= 0.96; // the surface calms down when the pointer rests
+    pointer.energy *= 0.95; // the surface calms down when the pointer rests
     requestAnimationFrame(loop);
   }
 
@@ -213,7 +229,7 @@
     const moved = Math.hypot(e.clientX - pointer.x, e.clientY - pointer.y);
     pointer.x = e.clientX;
     pointer.y = e.clientY;
-    if (moved < 300) pointer.energy = Math.min(1, pointer.energy + moved / 160);
+    if (moved < 300) pointer.energy = Math.min(1, pointer.energy + moved / 90);
   }, { passive: true });
 
   window.addEventListener('pointerdown', (e) => {
