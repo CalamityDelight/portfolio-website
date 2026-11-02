@@ -1,7 +1,7 @@
 {
   "name": "portfolio-website",
   "version": "1.0.0",
-  "description": "Axel af Ugglas \u2014 portfolio of AI video work and CV (Berghs ACE2627 blog project)",
+  "description": "Axel af Ugglas — portfolio of AI video work and CV (Berghs ACE2627 blog project)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -18,6 +18,7 @@
   "type": "commonjs",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cloudinary": "^2.11.0",
     "dotenv": "^18.0.9",
     "express": "^4.22.3",
     "express-session": "^1.19.0",

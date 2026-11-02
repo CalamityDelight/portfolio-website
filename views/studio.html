@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Studio — Axel af Ugglas</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/studio.css">
+</head>
+<body class="admin">
+  <canvas id="fibres" aria-hidden="true"></canvas>
+
+  <!-- This page is only sent to a signed-in user (see the /studio route in server.js) -->
+  <header class="site-header">
+    <a class="logo" href="/">Axel af Ugglas<span>Studio</span></a>
+    <div class="studio-actions">
+      <a class="btn btn--quiet" href="/">View site</a>
+      <button class="btn btn--quiet" type="button" id="sign-out">Sign out</button>
+    </div>
+  </header>
+
+  <main class="studio">
+    <!-- List of works -->
+    <section class="studio__list">
+      <div class="studio__list-head">
+        <h1 class="studio__title">Works</h1>
+        <button class="btn" type="button" id="new-work">+ New work</button>
+      </div>
+      <ol id="work-list" class="work-list"></ol>
+    </section>
+
+    <!-- Editor for one work (hidden until you pick or add one) -->
+    <section class="studio__editor" id="editor" hidden>
+      <form id="post-form" class="editor-form" novalidate>
+        <header class="editor-form__head">
+          <span class="label label--accent" id="editor-label">New work</span>
+        </header>
+
+        <div class="grid-2">
+          <div class="field field--wide">
+            <label for="f-title">Title</label>
+            <input id="f-title" name="title" required maxlength="200">
+          </div>
+          <div class="field">
+            <label for="f-slug">Slug (used in the link)</label>
+            <input id="f-slug" name="slug" placeholder="made from the title">
+          </div>
+          <div class="field">
+            <label for="f-year">Year</label>
+            <input id="f-year" name="year" type="number" min="1900" max="2100">
+          </div>
+          <div class="field">
+            <label for="f-position">Position in the cube</label>
+            <input id="f-position" name="position" type="number" min="0">
+          </div>
+        </div>
+
+        <!-- Video -->
+        <fieldset class="editor-block">
+          <legend class="label">Video</legend>
+          <video id="video-preview" class="video-preview" controls hidden></video>
+          <div class="field">
+            <label for="f-video">Video link</label>
+            <input id="f-video" name="video_url" placeholder="Filled in when you upload">
+          </div>
+          <label class="btn btn--file">
+            Upload video
+            <input type="file" id="video-file" accept="video/*">
+          </label>
+          <p class="hint">Max 100 MB on Cloudinary's free plan.</p>
+          <progress id="video-progress" max="100" value="0" hidden></progress>
+        </fieldset>
+
+        <!-- Summary (Part 3 adds "Generate summary" with AI) -->
+        <fieldset class="editor-block">
+          <legend class="label">Summary</legend>
+          <div class="field">
+            <label for="f-summary">Approved summary, shown under the video</label>
+            <textarea id="f-summary" name="summary" rows="5"></textarea>
+          </div>
+        </fieldset>
+
+        <!-- Process blocks -->
+        <fieldset class="editor-block">
+          <legend class="label">Process</legend>
+          <ol id="blocks" class="blocks"></ol>
+          <div class="row">
+            <button class="btn btn--quiet" type="button" data-add-block="text">+ Text block</button>
+            <button class="btn btn--quiet" type="button" data-add-block="list">+ List block</button>
+          </div>
+        </fieldset>
+
+        <!-- Reference images -->
+        <fieldset class="editor-block">
+          <legend class="label">Reference images</legend>
+          <ol id="images" class="images"></ol>
+          <label class="btn btn--file">
+            Upload images
+            <input type="file" id="image-files" accept="image/*" multiple>
+          </label>
+          <progress id="image-progress" max="100" value="0" hidden></progress>
+        </fieldset>
+
+        <!-- Tags from the fixed list -->
+        <fieldset class="editor-block">
+          <legend class="label">Tags</legend>
+          <div id="tags" class="tag-picker"></div>
+        </fieldset>
+
+        <p class="form-message" id="form-message" role="status"></p>
+
+        <div class="row row--end">
+          <button class="btn btn--danger" type="button" id="delete-work" hidden>Delete work</button>
+          <button class="btn btn--quiet" type="button" id="cancel-edit">Cancel</button>
+          <button class="btn" type="submit">Save</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="/js/fibres.js"></script>
+  <script type="module" src="/js/studio.js"></script>
+</body>
+</html>

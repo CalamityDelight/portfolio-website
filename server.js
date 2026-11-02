@@ -3,7 +3,6 @@ require('dotenv').config({ quiet: true }); // reads secrets from .env into proce
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
-const db = require('./db');
 const auth = require('./auth');
 
 const app = express();
@@ -32,21 +31,15 @@ app.use(session({
 // extensions: ['html'] lets /login serve login.html
 app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] }));
 
-app.use(auth.router);
+// ---------- Routes ----------
+app.use(auth.router);          // login, logout, "am I signed in?"
+app.use(require('./posts'));   // read, add, edit, delete works
+app.use(require('./uploads')); // signs uploads to Cloudinary
 
-// ---------- Posts ----------
-
-// All posts in Axel's chosen order. This is what builds the cube.
-app.get('/api/posts', async (req, res, next) => {
-  try {
-    const { rows } = await db.query(
-      `SELECT id, slug, title, year, position, video_url, process, reference_images, tags, summary
-       FROM posts ORDER BY position, created_at`
-    );
-    res.json(rows);
-  } catch (err) {
-    next(err);
-  }
+// The studio page itself is only sent to a signed-in user; everyone else goes to /login
+app.get('/studio', (req, res) => {
+  if (!req.session.userId) return res.redirect('/login');
+  res.sendFile(path.join(__dirname, 'views', 'studio.html'));
 });
 
 // ---------- Errors ----------
