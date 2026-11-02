@@ -1,33 +1,41 @@
 // The magnetic field: the living background inside the cube.
-// Layer 1: a purple fibre texture, drawn once (fibres follow a "flow field",
-//          so neighbouring lines bend together like smoke or field lines).
-// Layer 2: dark purple field lines and turquoise currents, animated every frame.
-//          How tall, fast and bright they are follows Earth's real magnetic field
-//          (Kp 0–9, set by field.js).
-// Layer 3: bioluminescence. The field reacts to the visitor like plankton in dark
-//          water: the cursor lights it up and pushes the lines aside, sparks trail
-//          behind it, a click sends out a ripple, and a cube turn makes it surge.
+//
+// Layer 1: a still purple fibre texture, drawn once, for depth.
+// Layer 2: smoke. Thousands of tiny particles drift through a "flow field" (at every
+//          point the field gives a direction, and the field slowly changes over time).
+//          Each frame they move a little and leave a faint purple line; older lines
+//          fade, so together they draw soft, moving wisps like magnetic smoke.
+//          Earth's real magnetic field (Kp 0–9, set by field.js) decides how many
+//          particles there are, how fast they move and how turbulent the flow is.
+//          A few particles carry a bright turquoise sheen.
+// Layer 3: bioluminescence. The smoke reacts to the visitor like plankton in dark
+//          water: the cursor parts it and charges it turquoise, sparks trail behind,
+//          a click sends out ripples, and a cube turn makes the field surge.
 // Pages with <canvas data-mode="still"> (login, studio) only get the still texture.
 
 (function () {
   const canvas = document.getElementById('fibres');
   const ctx = canvas.getContext('2d');
-  const texture = document.createElement('canvas'); // the still layer, kept off-screen
+  const texture = document.createElement('canvas'); // layer 1, kept off-screen
+  const smoke = document.createElement('canvas');   // layer 2: trails build up here
+  const smokeCtx = smoke.getContext('2d');
+  const vignette = document.createElement('canvas'); // darkens the edges to near black
   const still = canvas.dataset.mode === 'still';
   const TURQUOISE = '94, 240, 196';
 
   let width = 0;
   let height = 0;
+  let dpr = 1;
   let intensity = 0.2;  // 0 = Kp 0 (calm) … 1 = Kp 9 (extreme storm)
   let enabled = false;  // field.js switches the animation on
   let surge = 0;        // extra motion right after the cube turns, fading out
 
-  // The visitor's pointer, and how much it is stirring the water right now (0–1)
-  const pointer = { x: -9999, y: -9999, energy: 0 };
+  const pointer = { x: -9999, y: -9999, energy: 0 }; // energy: how hard the water is stirred (0–1)
+  let particles = [];
   let sparks = [];
   let ripples = [];
 
-  // Small seeded random generator, so the texture looks the same on every visit
+  // Small seeded random generator, so the still texture looks the same on every visit
   function seededRandom(seed) {
     return function () {
       seed = (seed + 0x6d2b79f5) | 0;
@@ -37,62 +45,146 @@
     };
   }
 
-  // Direction of the flow at (x, y). Overlapping sine waves give soft swirls.
-  function flowAngle(x, y) {
-    return (Math.sin(x * 5.5) + Math.cos(y * 6.5) + Math.sin((x - y) * 3.1)) * Math.PI * 0.6;
-  }
-
-  // Where fibres gather (in 0–1 screen units)
+  // Where the smoke gathers (0–1 screen units), echoing the clouds in the reference.
+  // The clouds drift slowly, so the wisps wander across the screen over time.
   const clouds = [
-    { x: 0.12, y: 0.2, r: 0.17 },
-    { x: 0.86, y: 0.62, r: 0.15 },
-    { x: 0.42, y: 0.98, r: 0.12 },
+    { x: 0.18, y: 0.4, r: 0.13 },
+    { x: 0.8, y: 0.72, r: 0.12 },
+    { x: 0.5, y: 0.98, r: 0.1 },
+    { x: 0.72, y: 0.1, r: 0.09 },
   ];
 
-  function drawTexture(dpr) {
+  // ---------- Layer 1: still texture ----------
+  function drawTexture() {
     texture.width = width * dpr;
     texture.height = height * dpr;
     const t = texture.getContext('2d');
     t.setTransform(dpr, 0, 0, dpr, 0, 0);
-
     const random = seededRandom(7);
     const unit = Math.max(width, height);
-    const count = Math.min(2200, Math.round((width * height) / 700));
+    const angle = (x, y) => (Math.sin(x * 5.5) + Math.cos(y * 6.5) + Math.sin((x - y) * 3.1)) * Math.PI * 0.6;
 
-    // 'lighter' adds overlapping lines together, which gives the soft glow
     t.globalCompositeOperation = 'lighter';
     t.lineCap = 'round';
+    const count = Math.min(1600, Math.round((width * height) / 900));
     for (let i = 0; i < count; i++) {
       const c = clouds[Math.floor(random() * clouds.length)];
       let x = (c.x + (random() + random() + random() - 1.5) * c.r) * width;
       let y = (c.y + (random() + random() + random() - 1.5) * c.r) * height;
-
-      const glint = random();
-      t.strokeStyle = glint < 0.04 ? `rgba(${TURQUOISE}, 0.16)`       // a few turquoise strands
-        : glint < 0.08 ? 'rgba(170, 130, 255, 0.22)'
-        : `rgba(104, 62, 210, ${0.05 + random() * 0.09})`;
-      t.lineWidth = glint < 0.08 ? 0.9 : 0.4 + random() * 0.5;
-
+      t.strokeStyle = `rgba(96, 56, 196, ${0.03 + random() * 0.06})`;
+      t.lineWidth = 0.4 + random() * 0.5;
       t.beginPath();
       t.moveTo(x, y);
       const steps = 80 + random() * 160;
       for (let s = 0; s < steps; s++) {
-        const a = flowAngle(x / unit, y / unit);
+        const a = angle(x / unit, y / unit);
         x += Math.cos(a) * 2.2;
         y += Math.sin(a) * 2.2;
         t.lineTo(x, y);
       }
       t.stroke();
     }
-
-    // Darken the edges into near-black purple
-    t.globalCompositeOperation = 'source-over';
-    const vignette = t.createRadialGradient(width / 2, height / 2, Math.min(width, height) * 0.2, width / 2, height / 2, Math.max(width, height) * 0.75);
-    vignette.addColorStop(0, 'rgba(11, 7, 17, 0)');
-    vignette.addColorStop(1, 'rgba(11, 7, 17, 0.75)');
-    t.fillStyle = vignette;
-    t.fillRect(0, 0, width, height);
   }
+
+  function drawVignette() {
+    vignette.width = width * dpr;
+    vignette.height = height * dpr;
+    const v = vignette.getContext('2d');
+    v.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const g = v.createRadialGradient(width / 2, height / 2, Math.min(width, height) * 0.25, width / 2, height / 2, Math.max(width, height) * 0.72);
+    g.addColorStop(0, 'rgba(7, 4, 11, 0)');
+    g.addColorStop(1, 'rgba(7, 4, 11, 0.85)');
+    v.fillStyle = g;
+    v.fillRect(0, 0, width, height);
+  }
+
+  // ---------- Layer 2: smoke ----------
+
+  // The flow direction at (x, y) at a moment in time. Overlapping sine waves that
+  // shift with time give slowly changing swirls; more Kp = tighter, busier swirls.
+  function flow(x, y, time) {
+    const f = 0.0026 * (1 + 0.8 * intensity);
+    return (
+      Math.sin(x * f + time * 0.11) +
+      Math.cos(y * f * 1.3 - time * 0.09) +
+      Math.sin((x + y) * f * 0.6 + time * 0.05)
+    ) * Math.PI * 0.75 - Math.PI / 2; // the - PI/2 leans the smoke upwards, like rising wisps
+  }
+
+  // A new particle, born somewhere in one of the clouds
+  function spawn(p, time) {
+    const c = clouds[Math.floor(Math.random() * clouds.length)];
+    const drift = Math.sin(time * 0.05 + c.x * 10) * 0.05; // clouds wander slowly
+    const spread = () => (Math.random() + Math.random() + Math.random() - 1.5) * c.r;
+    p.x = (c.x + drift + spread()) * width;
+    p.y = (c.y + spread()) * height;
+    p.life = 120 + Math.random() * 380;   // in frames
+    p.sheen = Math.random() < 0.025;      // about 1 in 40 carries the turquoise sheen
+    p.charge = 0;                         // turquoise glow from being touched
+    return p;
+  }
+
+  function stepSmoke(time) {
+    const k = intensity;
+    const target = Math.round((700 + 1500 * k) * Math.min(1, (width * height) / (1440 * 900)));
+    while (particles.length < target) particles.push(spawn({}, time));
+    if (particles.length > target) particles.length = target;
+
+    const speed = (0.45 + 1.5 * k) * (1 + surge);
+
+    // Fade the old trails a little, instead of wiping them: this is what makes the wisps
+    smokeCtx.globalCompositeOperation = 'destination-out';
+    smokeCtx.fillStyle = `rgba(0, 0, 0, ${0.03 + 0.02 * k})`;
+    smokeCtx.fillRect(0, 0, width, height);
+    smokeCtx.globalCompositeOperation = 'lighter';
+    smokeCtx.lineCap = 'round';
+
+    // All purple segments go in one path and all turquoise in another: drawing
+    // two big paths per frame is far faster than thousands of small ones
+    const purple = new Path2D();
+    const glow = new Path2D();
+    const r2 = 150 * 150;
+
+    for (const p of particles) {
+      const a = flow(p.x, p.y, time);
+      let vx = Math.cos(a) * speed;
+      let vy = Math.sin(a) * speed;
+
+      // The pointer parts the smoke and charges it with turquoise light
+      if (pointer.energy > 0.01) {
+        const dx = p.x - pointer.x;
+        const dy = p.y - pointer.y;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < r2 * 4) {
+          const falloff = Math.exp(-d2 / r2) * pointer.energy;
+          const d = Math.sqrt(d2) || 1;
+          vx += (dx / d) * 3.5 * falloff;
+          vy += (dy / d) * 3.5 * falloff;
+          p.charge = Math.min(1, p.charge + falloff * 0.5);
+        }
+      }
+
+      const x0 = p.x;
+      const y0 = p.y;
+      p.x += vx;
+      p.y += vy;
+      const path = p.sheen || p.charge > 0.15 ? glow : purple;
+      path.moveTo(x0, y0);
+      path.lineTo(p.x, p.y);
+
+      p.charge *= 0.985;
+      if (--p.life <= 0 || p.x < -50 || p.x > width + 50 || p.y < -50 || p.y > height + 50) spawn(p, time);
+    }
+
+    smokeCtx.lineWidth = 0.9;
+    smokeCtx.strokeStyle = `rgba(165, 95, 255, ${0.26 + 0.1 * k})`;
+    smokeCtx.stroke(purple);
+    smokeCtx.lineWidth = 1;
+    smokeCtx.strokeStyle = `rgba(${TURQUOISE}, ${0.3 + 0.15 * k})`;
+    smokeCtx.stroke(glow);
+  }
+
+  // ---------- Layer 3: bioluminescence ----------
 
   // One glowing dot, drawn once and stamped for every spark
   const sprite = document.createElement('canvas');
@@ -100,7 +192,7 @@
   (() => {
     const s = sprite.getContext('2d');
     const g = s.createRadialGradient(16, 16, 0, 16, 16, 16);
-    g.addColorStop(0, 'rgba(220, 255, 240, 1)');
+    g.addColorStop(0, 'rgba(225, 255, 242, 1)');
     g.addColorStop(0.2, `rgba(${TURQUOISE}, 0.8)`);
     g.addColorStop(0.5, `rgba(${TURQUOISE}, 0.15)`);
     g.addColorStop(1, `rgba(${TURQUOISE}, 0)`);
@@ -108,69 +200,11 @@
     s.fillRect(0, 0, 32, 32);
   })();
 
-  // How far the pointer pushes a point of a line away (water parting around a finger)
-  function push(x, y) {
-    if (pointer.energy < 0.01) return 0;
-    const dx = x - pointer.x;
-    const dy = y - pointer.y;
-    const falloff = Math.exp(-(dx * dx + dy * dy) / (160 * 160));
-    return Math.sign(dy || 1) * 46 * pointer.energy * falloff;
-  }
-
-  // Draws one wavy line across the screen
-  function waveLine(y0, amplitude, frequency, speed, time, phase) {
-    ctx.beginPath();
-    for (let x = -20; x <= width + 20; x += 12) {
-      let y = y0
-        + amplitude * Math.sin(x * frequency + time * speed + phase)
-        + amplitude * 0.45 * Math.sin(x * frequency * 2.7 - time * speed * 0.8 + phase * 1.7);
-      y += push(x, y);
-      if (x === -20) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
-    ctx.stroke();
-  }
-
-  // Field lines (purple) and currents (turquoise). Stronger field = more, taller, faster, brighter.
-  function drawWaves(time) {
-    const k = intensity;
-    const boost = 1 + surge;
-    const speed = (0.25 + 1.6 * k) * (1 + surge * 0.6);
-
-    // Purple field lines
-    const lines = Math.round(14 + 26 * k);
-    const amplitude = (18 + 64 * k) * boost;
-    const purpleAlpha = 0.12 + 0.16 * k;
-    ctx.lineWidth = 1;
-    for (let i = 0; i < lines; i++) {
-      const phase = i * 0.55;
-      const alpha = purpleAlpha * (0.55 + 0.45 * Math.sin(time * speed * 0.7 + phase));
-      ctx.strokeStyle = `rgba(118, 70, 235, ${alpha.toFixed(3)})`;
-      waveLine((height * (i + 0.5)) / lines, amplitude, 0.004, speed, time, phase);
-    }
-
-    // Turquoise currents: fewer, longer and slower, drawn twice (wide and faint, then thin)
-    // so they glow like bioluminescent streaks
-    const currents = Math.round(4 + 6 * k);
-    for (let i = 0; i < currents; i++) {
-      const phase = i * 1.9 + 0.7;
-      const y0 = height * (0.15 + 0.7 * ((i * 0.618) % 1));
-      const glow = (0.05 + 0.1 * k) * (0.4 + 0.6 * Math.max(0, Math.sin(time * 0.35 + phase)));
-      ctx.strokeStyle = `rgba(${TURQUOISE}, ${(glow * 0.35).toFixed(3)})`;
-      ctx.lineWidth = 7;
-      waveLine(y0, amplitude * 1.6, 0.0022, speed * 0.6, time, phase);
-      ctx.strokeStyle = `rgba(${TURQUOISE}, ${glow.toFixed(3)})`;
-      ctx.lineWidth = 1.2;
-      waveLine(y0, amplitude * 1.6, 0.0022, speed * 0.6, time, phase);
-    }
-  }
-
-  // The water lights up where it is touched
   function drawBioluminescence() {
     if (pointer.energy > 0.01) {
-      const r = 180 + 120 * pointer.energy;
+      const r = 160 + 100 * pointer.energy;
       const g = ctx.createRadialGradient(pointer.x, pointer.y, 0, pointer.x, pointer.y, r);
-      g.addColorStop(0, `rgba(${TURQUOISE}, ${(0.16 * pointer.energy).toFixed(3)})`);
+      g.addColorStop(0, `rgba(${TURQUOISE}, ${(0.09 * pointer.energy).toFixed(3)})`);
       g.addColorStop(1, `rgba(${TURQUOISE}, 0)`);
       ctx.fillStyle = g;
       ctx.fillRect(pointer.x - r, pointer.y - r, r * 2, r * 2);
@@ -183,40 +217,43 @@
       s.x += Math.cos(s.angle) * s.speed;
       s.y += Math.sin(s.angle) * s.speed - 0.15;
       s.speed *= 0.985;
-      ctx.globalAlpha = Math.min(1, s.life / s.max * 1.5) * (0.7 + 0.3 * Math.random());
-      const size = s.size * 10;
+      ctx.globalAlpha = Math.min(1, (s.life / s.max) * 1.5) * (0.6 + 0.4 * Math.random());
+      const size = s.size * 9;
       ctx.drawImage(sprite, s.x - size / 2, s.y - size / 2, size, size);
     }
     ctx.globalAlpha = 1;
 
     // Rings spreading out from a click
     ripples = ripples.filter((r) => (r.life -= 1) > 0);
-    ctx.lineWidth = 1.2;
+    ctx.lineWidth = 1;
     for (const r of ripples) {
-      const p = 1 - r.life / r.max;               // 0 → 1 over the ripple's life
-      ctx.strokeStyle = `rgba(${TURQUOISE}, ${(0.5 * (1 - p)).toFixed(3)})`;
+      const p = 1 - r.life / r.max; // 0 → 1 over the ripple's life
+      ctx.strokeStyle = `rgba(${TURQUOISE}, ${(0.45 * (1 - p)).toFixed(3)})`;
       ctx.beginPath();
-      ctx.arc(r.x, r.y, 10 + p * r.size, 0, Math.PI * 2);
+      ctx.arc(r.x, r.y, 8 + p * r.size, 0, Math.PI * 2);
       ctx.stroke();
     }
   }
 
+  // ---------- Putting the layers together ----------
   function render(now = 0) {
     ctx.clearRect(0, 0, width, height);
-    if (!enabled) {
-      ctx.drawImage(texture, 0, 0, width, height);
-      return;
+    ctx.globalAlpha = enabled ? 0.55 : 1; // the still texture sits quietly under the smoke
+    ctx.drawImage(texture, 0, 0, width, height);
+    ctx.globalAlpha = 1;
+    if (enabled) {
+      stepSmoke(now / 1000);
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.drawImage(smoke, 0, 0, width, height);
+      ctx.globalCompositeOperation = 'source-over';
     }
-    const time = now / 1000;
-    // The texture itself sways a few pixels, stronger in a disturbed field
-    const sway = 3 + 10 * intensity;
-    ctx.drawImage(texture, Math.sin(time * 0.3) * sway - sway, Math.cos(time * 0.23) * sway - sway, width + sway * 2, height + sway * 2);
+    ctx.drawImage(vignette, 0, 0, width, height);
+    if (!enabled) return;
     ctx.globalCompositeOperation = 'lighter';
-    drawWaves(time);
-    drawBioluminescence();
+    drawBioluminescence(); // on top of the vignette, so the touch glows even near the edges
     ctx.globalCompositeOperation = 'source-over';
 
-    pointer.energy *= 0.965;   // the water calms down when the pointer rests
+    pointer.energy *= 0.965; // the water calms down when the pointer rests
     surge *= 0.97;
   }
 
@@ -227,13 +264,18 @@
   }
 
   function resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
     width = window.innerWidth;
     height = window.innerHeight;
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
+    for (const c of [canvas, smoke]) {
+      c.width = width * dpr;
+      c.height = height * dpr;
+    }
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    drawTexture(dpr);
+    smokeCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    particles = [];
+    drawTexture();
+    drawVignette();
     render(performance.now());
   }
 
@@ -247,33 +289,35 @@
   // ---------- The visitor touching the water ----------
   if (!still) {
     window.addEventListener('pointermove', (e) => {
-      const speed = Math.hypot(e.clientX - pointer.x, e.clientY - pointer.y);
-      const jumped = speed > 300; // first move, or the pointer re-entered the window
+      const moved = Math.hypot(e.clientX - pointer.x, e.clientY - pointer.y);
+      const jumped = moved > 300; // first move, or the pointer re-entered the window
       pointer.x = e.clientX;
       pointer.y = e.clientY;
       if (!enabled || jumped) return;
-      pointer.energy = Math.min(1, pointer.energy + speed / 120);
+      pointer.energy = Math.min(1, pointer.energy + moved / 120);
       // Faster strokes stir up more sparks
-      const count = Math.min(5, Math.floor(speed / 10));
+      const count = Math.min(4, Math.floor(moved / 12));
       for (let i = 0; i < count; i++) {
         const life = 50 + Math.random() * 90; // in frames
         sparks.push({
           x: e.clientX + (Math.random() - 0.5) * 24,
           y: e.clientY + (Math.random() - 0.5) * 24,
           angle: Math.random() * Math.PI * 2,
-          speed: 0.3 + Math.random() * 1.2,
-          size: 0.4 + Math.random() * 1.2,
+          speed: 0.3 + Math.random() * 1.1,
+          size: 0.4 + Math.random() * 1.1,
           life,
           max: life,
         });
       }
-      if (sparks.length > 400) sparks.splice(0, sparks.length - 400);
+      if (sparks.length > 300) sparks.splice(0, sparks.length - 300);
     }, { passive: true });
 
     window.addEventListener('pointerdown', (e) => {
       if (!enabled) return;
-      ripples.push({ x: e.clientX, y: e.clientY, size: 220, life: 80, max: 80 });
-      ripples.push({ x: e.clientX, y: e.clientY, size: 140, life: 60, max: 60 });
+      ripples.push({ x: e.clientX, y: e.clientY, size: 200, life: 80, max: 80 });
+      ripples.push({ x: e.clientX, y: e.clientY, size: 120, life: 60, max: 60 });
+      pointer.x = e.clientX;
+      pointer.y = e.clientY;
       pointer.energy = 1;
     }, { passive: true });
   }
@@ -290,9 +334,9 @@
       if (on && !wasOn) requestAnimationFrame(loop);
       if (!on) render();
     },
-    // The cube turned: the field swells for a moment, like water pushed by a moving body
+    // The cube turned: the smoke swirls faster for a moment, stirred by the moving cube
     surge() {
-      surge = 1.2;
+      surge = 1.4;
     },
   };
 })();
