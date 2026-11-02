@@ -5,18 +5,18 @@
 .kp {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  font-size: var(--size-label);
+  gap: 0.75rem;
+  font-size: 0.5625rem;          /* 9px: a quiet instrument readout */
   letter-spacing: var(--track-label);
   text-transform: uppercase;
   color: var(--text-muted);
   white-space: nowrap;
 }
-.kp__name { color: var(--text); }
-.kp__line { width: 76px; height: 20px; }
+.kp__name { color: var(--text-muted); }
+.kp__line { width: 56px; height: 16px; }
 
 .kp__toggle {
-  padding: 0.35em 1em;
+  padding: 0.3em 0.9em;
   border: 1px solid var(--line);
   border-radius: var(--radius-pill);
   background: none;
@@ -27,7 +27,7 @@
   cursor: pointer;
   transition: color 0.2s, border-color 0.2s;
 }
-.kp__toggle:hover { color: var(--green); border-color: var(--green); }
+.kp__toggle:hover { color: var(--glow); border-color: var(--glow); }
 
 /* With the effects off, a still image replaces the moving field.
    Put the Midjourney image at public/img/field-still.jpg; until then the

@@ -62,7 +62,7 @@
   cursor: pointer;
   transition: color 0.2s;
 }
-.menu__text-nav button:hover { color: var(--green); }
+.menu__text-nav button:hover { color: var(--glow); }
 
 /* ---------- Filter ---------- */
 .filter { margin-bottom: var(--space-5); }
@@ -79,18 +79,18 @@
   cursor: pointer;
   transition: color 0.2s, border-color 0.2s;
 }
-.filter__tag:hover { color: var(--text); border-color: var(--green); }
-.filter__tag[aria-pressed="true"] { color: var(--green); border-color: var(--green); box-shadow: 0 0 10px var(--green-glow); }
+.filter__tag:hover { color: var(--text); border-color: var(--glow); }
+.filter__tag[aria-pressed="true"] { color: var(--glow); border-color: var(--glow); box-shadow: 0 0 10px var(--glow-soft); }
 
 .filter__results:not(:empty) { margin-top: var(--space-4); }
 .filter__list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
 .filter__item {
   max-width: 46rem;
   padding-left: var(--space-3);
-  border-left: 1px solid var(--green);
+  border-left: 1px solid var(--glow);
 }
 .filter__item p { margin: var(--space-1) 0 var(--space-2); }
-mark { background: rgba(198, 255, 26, 0.18); color: var(--text); padding: 0 0.15em; }
+mark { background: rgba(94, 240, 196, 0.18); color: var(--text); padding: 0 0.15em; }
 
 /* ---------- The unfolded cube ----------
    Columns side by side, like the faces of the cube laid flat */
@@ -105,7 +105,7 @@ mark { background: rgba(198, 255, 26, 0.18); color: var(--text); padding: 0 0.15
 .map__col {
   padding: var(--space-2);
   border: 1px solid var(--line);
-  border-top: 1px solid rgba(198, 255, 26, 0.5);
+  border-top: 1px solid rgba(94, 240, 196, 0.5);
   background: rgba(18, 11, 30, 0.6);
 }
 .map__title {
@@ -124,7 +124,7 @@ mark { background: rgba(198, 255, 26, 0.18); color: var(--text); padding: 0 0.15
   cursor: pointer;
 }
 .map__title .label { display: block; margin-bottom: 0.25rem; }
-.map__title:hover { color: var(--green); }
+.map__title:hover { color: var(--glow); }
 
 .map__levels { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
 .map__level {
@@ -140,8 +140,8 @@ mark { background: rgba(198, 255, 26, 0.18); color: var(--text); padding: 0 0.15
   cursor: pointer;
   transition: border-color 0.2s, color 0.2s;
 }
-.map__level:hover { border-color: var(--green); color: var(--text); }
-.map__level.is-here { border-color: var(--green); color: var(--green); box-shadow: 0 0 10px var(--green-glow); }
+.map__level:hover { border-color: var(--glow); color: var(--text); }
+.map__level.is-here { border-color: var(--glow); color: var(--glow); box-shadow: 0 0 10px var(--glow-soft); }
 
 /* ---------- Overview button: a small neon cube, slowly swaying ---------- */
 .overview {
@@ -163,7 +163,7 @@ mark { background: rgba(198, 255, 26, 0.18); color: var(--text); padding: 0 0.15
   white-space: nowrap;
   transition: color 0.2s;
 }
-.overview:hover .overview__hint { color: var(--green); }
+.overview:hover .overview__hint { color: var(--glow); }
 
 .mini-cube {
   --s: 22px;
@@ -181,9 +181,9 @@ mark { background: rgba(198, 255, 26, 0.18); color: var(--text); padding: 0 0.15
 .mini-cube__face {
   position: absolute;
   inset: 0;
-  border: 1px solid rgba(198, 255, 26, 0.8);
-  background: rgba(198, 255, 26, 0.05);
-  box-shadow: 0 0 6px rgba(198, 255, 26, 0.35), inset 0 0 4px rgba(198, 255, 26, 0.25);
+  border: 1px solid rgba(94, 240, 196, 0.8);
+  background: rgba(94, 240, 196, 0.05);
+  box-shadow: 0 0 6px rgba(94, 240, 196, 0.35), inset 0 0 4px rgba(94, 240, 196, 0.25);
 }
 .mini-cube__face--front  { transform: translateZ(calc(var(--s) / 2)); }
 .mini-cube__face--back   { transform: rotateY(180deg) translateZ(calc(var(--s) / 2)); }
@@ -191,6 +191,11 @@ mark { background: rgba(198, 255, 26, 0.18); color: var(--text); padding: 0 0.15
 .mini-cube__face--left   { transform: rotateY(-90deg) translateZ(calc(var(--s) / 2)); }
 .mini-cube__face--top    { transform: rotateX(90deg) translateZ(calc(var(--s) / 2)); }
 .mini-cube__face--bottom { transform: rotateX(-90deg) translateZ(calc(var(--s) / 2)); }
+
+/* Phones have no space bar, so the hint just says "Overview" */
+@media (max-width: 700px), (hover: none) {
+  .overview__key { display: none; }
+}
 
 @media (max-width: 700px) {
   .menu__inner { padding: 6rem var(--space-3) var(--space-4); }

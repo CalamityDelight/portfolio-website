@@ -21,7 +21,7 @@ Built for the Berghs individual blog project (Programming & Methods, ACE2627).
 | 7 PD | AI API | **Automatic summary** (option d) with Claude through the Anthropic API. In the studio Axel generates a draft from the title, process and tags, edits it and approves it. Only the approved text is published, under the video. |
 | 8 PD | Posts and comments in Neon | Posts, comments and the login live in Neon Postgres (`db/schema.sql`). |
 
-Other features: the site is a 3D cube that turns 90° when you move, throwing neon particles off its edges; navigation by arrow keys, phone swipes and two-finger trackpad swipes; a navigation bar with a dot indicator, arrow keys and a small overview cube; a custom video player; and uploads of video and reference images to Cloudinary from the studio.
+Other features: the site is a full-screen 3D cube that turns 90° when you move, with glowing particles drifting off its edges; the background reacts to the mouse like bioluminescent water (it lights up, parts around the cursor and ripples on click); navigation by arrow keys, phone swipes and two-finger trackpad swipes; a navigation bar with a dot indicator, arrow keys and a small overview cube; a custom video player; and uploads of video and reference images to Cloudinary from the studio.
 
 ## What was left out on purpose
 
@@ -111,7 +111,8 @@ No account or key. The server reads `https://services.swpc.noaa.gov/products/noa
 **Visitors**
 - **Arrow keys**, the arrows in the bar at the bottom, a **two-finger trackpad swipe** or a **phone swipe**: left/right turn the cube between Home and the works (always landing at the top), up/down go through a column. Tall faces scroll first.
 - **Space, Enter** or the small **cube** at the bottom opens the overview map and the tag filter. **Esc** closes it.
-- **Turn off effects** (top right) stops the magnetic waves and shows a still background image.
+- **Move the mouse** over the page to stir the field; **click** to send out a ripple.
+- **Turn off effects** (top right) stops the magnetic waves and the mouse effects, and shows a still background image.
 
 **Axel**
 - Click **login** at the bottom of the CV, sign in, and you are in the studio.

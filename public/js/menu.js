@@ -69,7 +69,7 @@ export function initMenu(nav, works, tags) {
         <i class="mini-cube__face mini-cube__face--top"></i>
         <i class="mini-cube__face mini-cube__face--bottom"></i>
       </span>
-      <span class="overview__hint" aria-hidden="true">Space · zoom out</span>
+      <span class="overview__hint" aria-hidden="true">Overview<span class="overview__key"> (press space)</span></span>
     </button>`);
   const toggleBtn = document.querySelector('.overview');
 

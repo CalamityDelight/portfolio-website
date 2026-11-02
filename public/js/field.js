@@ -7,8 +7,8 @@ const STORAGE_KEY = 'magnetic-effects';
 function startIntensityLine(canvas, getIntensity) {
   const ctx = canvas.getContext('2d');
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const w = canvas.width = 76 * dpr;
-  const h = canvas.height = 20 * dpr;
+  const w = canvas.width = 56 * dpr;
+  const h = canvas.height = 16 * dpr;
   const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let last = 0;
 
@@ -18,9 +18,9 @@ function startIntensityLine(canvas, getIntensity) {
       const k = getIntensity();
       const t = still ? 0 : now / 1000;
       ctx.clearRect(0, 0, w, h);
-      ctx.strokeStyle = '#c6ff1a';
+      ctx.strokeStyle = '#5ef0c4';
       ctx.lineWidth = 1.2 * dpr;
-      ctx.shadowColor = 'rgba(198, 255, 26, 0.8)';
+      ctx.shadowColor = 'rgba(94, 240, 196, 0.8)';
       ctx.shadowBlur = 4 * dpr;
       ctx.beginPath();
       for (let x = 0; x <= w; x += dpr) {
