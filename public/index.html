@@ -12,6 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/home.css">
 </head>
 <body>
   <canvas id="fibres" aria-hidden="true"></canvas>
@@ -19,6 +20,187 @@
   <header class="site-header">
     <a class="logo" href="#home">Axel af Ugglas<span>AI video work</span></a>
   </header>
+
+  <!-- The cube: one column for Home, then one column per work (added by JS).
+       Each column holds "panels", read top to bottom. -->
+  <main id="cube" class="cube">
+
+    <section class="column" id="home" data-title="Home">
+
+      <!-- Level 1: intro -->
+      <article class="panel" data-level="Intro">
+        <div class="panel__inner intro">
+          <div class="intro__text">
+            <span class="label label--accent">Portfolio · AI video</span>
+            <h1>Axel<br>af Ugglas</h1>
+            <!-- Placeholder text: Axel replaces this with his own intro -->
+            <p class="lead">
+              Digital project manager and AI video maker. I turn ideas into
+              cinematic short films with AI-assisted workflows, and I like
+              building the tools and processes around them.
+            </p>
+          </div>
+
+          <figure class="intro__image">
+            <!-- Placeholder: swap for <img src="/img/axel.jpg" alt="Portrait of Axel af Ugglas"> -->
+            <div class="portrait-placeholder" role="img" aria-label="Placeholder for a portrait of Axel">
+              <span class="label">Portrait</span>
+            </div>
+          </figure>
+
+          <div class="intro__hint">
+            <!-- Arrow-key hint on desktop, swipe hint on touch screens -->
+            <div class="keys" aria-hidden="true">
+              <span class="key key--up">↑</span>
+              <span class="key key--left">←</span>
+              <span class="key key--down">↓</span>
+              <span class="key key--right">→</span>
+            </div>
+            <p class="hint-text label">
+              <span class="hint--keys">Use the arrow keys to explore</span>
+              <span class="hint--touch">Swipe to explore</span>
+            </p>
+            <a class="btn" href="#work" data-action="browse">Browse my work →</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Level 2: CV -->
+      <article class="panel" data-level="CV">
+        <div class="panel__inner cv">
+          <header class="cv__head">
+            <span class="label label--accent">Curriculum vitae</span>
+            <h2>Digital Project Manager</h2>
+            <p class="lead">
+              Project leader with a background in cognitive science and skills
+              spanning entrepreneurship, web, app and VR development. Now building
+              practical expertise in AI-assisted content production and creative workflows.
+            </p>
+          </header>
+
+          <section class="cv__section">
+            <h3 class="label">Experience</h3>
+            <ol class="cv__list">
+              <li>
+                <span class="cv__period">Aug 2025 – May 2026</span>
+                <div>
+                  <h4>Growth (part time) <span>Toffe AB, Stockholm</span></h4>
+                  <p>Brand development, content and growth for an early-stage consumer product. Designed the website, logo and labels; led social media and sales content.</p>
+                </div>
+              </li>
+              <li>
+                <span class="cv__period">Aug 2024 – May 2025</span>
+                <div>
+                  <h4>Podcast Host (part time) <span>Stockholm</span></h4>
+                  <p>Long-form conversations about wellbeing, mindset and personal development.</p>
+                </div>
+              </li>
+              <li>
+                <span class="cv__period">Jan 2024 – Apr 2024</span>
+                <div>
+                  <h4>Sales Consultant <span>Svea Solar, Stockholm</span></h4>
+                  <p>Sold solar energy solutions to residential clients.</p>
+                </div>
+              </li>
+              <li>
+                <span class="cv__period">Aug 2022 – Nov 2023</span>
+                <div>
+                  <h4>Product Owner / Technical Project Manager <span>SAMI, Stockholm</span></h4>
+                  <p>Led the website, webshop, internal tools and infrastructure; owned roadmaps; delivered a music-licence web app and a members' app.</p>
+                </div>
+              </li>
+              <li>
+                <span class="cv__period">Aug 2021 – Aug 2022</span>
+                <div>
+                  <h4>Technical Project Manager / Operations <span>Warpin Media, Stockholm</span></h4>
+                  <p>Led technical projects; introduced Jira; built resource planning, time tracking and estimation systems; improved QA.</p>
+                </div>
+              </li>
+              <li>
+                <span class="cv__period">May 2021 – Oct 2021</span>
+                <div>
+                  <h4>Freelance VR Developer <span>Radio Innovation, Stockholm</span></h4>
+                  <p>VR concepts; a Quest 2 game for a Paris conference; a multiplayer 3D presentation shown at GITEX Dubai.</p>
+                </div>
+              </li>
+              <li>
+                <span class="cv__period">Jan 2021 – Jun 2021</span>
+                <div>
+                  <h4>UX Designer (internship) <span>Dyno Robotics, Linköping</span></h4>
+                  <p>Tourism robot with Linköping Municipality; 3D models; conversational design in Dialogflow.</p>
+                </div>
+              </li>
+              <li>
+                <span class="cv__period">Jan 2021 – Jun 2021</span>
+                <div>
+                  <h4>Bachelor thesis (internship) <span>Around the Corner, Linköping</span></h4>
+                  <p>VR multiplayer game researching social presence.</p>
+                </div>
+              </li>
+            </ol>
+          </section>
+
+          <section class="cv__section">
+            <h3 class="label">Education</h3>
+            <ol class="cv__list">
+              <li>
+                <span class="cv__period">Aug 2026 – May 2027</span>
+                <div><h4>AI Content Engineering <span>Berghs School of Communication</span></h4></div>
+              </li>
+              <li>
+                <span class="cv__period">2018 – 2021</span>
+                <div><h4>BSc Cognitive Science <span>Linköping University</span></h4></div>
+              </li>
+              <li>
+                <span class="cv__period">2017</span>
+                <div><h4>Squad leader and basic training <span>Swedish Armed Forces</span></h4></div>
+              </li>
+              <li>
+                <span class="cv__period">2015 – 2017</span>
+                <div><h4>High school, Economics <span>Sigtunaskolan Humanistiska Läroverket</span></h4></div>
+              </li>
+            </ol>
+          </section>
+
+          <section class="cv__section">
+            <h3 class="label">Skills</h3>
+            <ul class="skills">
+              <li>Brand development</li>
+              <li>Social media content</li>
+              <li>Podcast hosting</li>
+              <li>Digital communication</li>
+              <li>Technical project management</li>
+              <li>Product development</li>
+              <li>Agile methodologies</li>
+              <li>Workflow improvement</li>
+              <li>Stakeholder coordination</li>
+              <li>Resource planning</li>
+              <li>HTML/CSS</li>
+              <li>Python</li>
+              <li>C#</li>
+              <li>Unity</li>
+              <li>3D visualization</li>
+              <li>Jira</li>
+              <li>AI-assisted ideation</li>
+              <li>Writing and content development</li>
+              <li>Research and concept exploration</li>
+            </ul>
+          </section>
+
+          <section class="cv__section">
+            <h3 class="label">Contact</h3>
+            <ul class="contact">
+              <li><a href="mailto:axelafugglas@gmail.com">axelafugglas@gmail.com</a></li>
+              <li><a href="https://www.linkedin.com/in/axel-af-ugglas-1040a6161/" target="_blank" rel="noopener">LinkedIn</a></li>
+              <li><a href="https://www.facebook.com/af.ugge/" target="_blank" rel="noopener">Facebook</a></li>
+              <li><a href="https://www.instagram.com/axelafugglas/" target="_blank" rel="noopener">Instagram</a></li>
+            </ul>
+          </section>
+        </div>
+      </article>
+    </section>
+
+  </main>
 
   <script src="/js/fibres.js"></script>
 </body>
