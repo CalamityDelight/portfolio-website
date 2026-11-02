@@ -1,50 +1,53 @@
-/* Earth's magnetic field: header readout, intensity line, effects switch, still image */
+/* Earth's magnetic field: the header readout and its vibrating circle */
 
 .site-header__right { display: flex; align-items: center; gap: var(--space-3); }
 
 .kp {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  font-size: 0.5625rem;          /* 9px: a quiet instrument readout */
+  gap: 0.7rem;
+  font-size: 0.5rem;             /* 8px: a quiet instrument readout */
   letter-spacing: var(--track-label);
   text-transform: uppercase;
   color: var(--text-muted);
   white-space: nowrap;
 }
-.kp__name { color: var(--text-muted); }
-.kp__line { width: 56px; height: 16px; }
 
-.kp__toggle {
-  padding: 0.2em 0;
-  border: 0;
-  border-bottom: 1px solid rgba(94, 240, 196, 0.35);
-  background: none;
-  color: var(--text-muted);
-  font: inherit;
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: color 0.2s, border-color 0.2s;
+/* A tiny purple circle that trembles like a magnet's field.
+   field.js sets how fast (--vibe-speed) and how far (--vibe-amp) from the Kp index. */
+.kp__orb {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border: 1px solid rgba(178, 136, 255, 0.95);
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(150, 100, 255, 0.7);
+  animation: kp-vibe var(--vibe-speed, 0.8s) linear infinite;
 }
-.kp__toggle:hover { color: var(--glow); border-color: var(--glow); }
+/* A faint outer ring, breathing slowly around it */
+.kp__orb::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border: 1px solid rgba(150, 100, 255, 0.35);
+  border-radius: 50%;
+  animation: kp-ring 3s ease-in-out infinite;
+}
+@keyframes kp-vibe {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(var(--vibe-amp, 0.5px), calc(var(--vibe-amp, 0.5px) * -0.6)); }
+  45% { transform: translate(calc(var(--vibe-amp, 0.5px) * -0.8), calc(var(--vibe-amp, 0.5px) * 0.4)); }
+  70% { transform: translate(calc(var(--vibe-amp, 0.5px) * 0.5), var(--vibe-amp, 0.5px)); }
+}
+@keyframes kp-ring {
+  0%, 100% { transform: scale(0.85); opacity: 0.3; }
+  50% { transform: scale(1.15); opacity: 0.8; }
+}
 
 @media (max-width: 900px) {
   .kp__name { display: none; }   /* "· Kp 2 · calm" is enough on small screens */
   .kp__value { margin-left: -0.3em; }
 }
 @media (max-width: 700px) {
-  /* Two rows on phones: line and switch on top, the Kp value underneath */
-  .kp {
-    display: grid;
-    grid-template-columns: auto auto;
-    grid-template-areas: "line toggle" "text text";
-    justify-items: end;
-    align-items: center;
-    gap: 2px var(--space-1);
-  }
-  .kp__text { grid-area: text; font-size: 0.625rem; }
-  .kp__line { grid-area: line; width: 44px; }
-  .kp__toggle { grid-area: toggle; font-size: 0.5625rem; letter-spacing: 0.12em; }
   .logo { white-space: nowrap; }
 }
