@@ -46,7 +46,8 @@
 .cube-ready .panel:focus { outline: none; }
 
 /* The double frame, drawn on top of each face so it turns with it.
-   It stays still; it only fades and shifts colour while the cube turns. */
+   A very faint purple line, and a slightly brighter trace drifting slowly
+   around it, so parts of the frame fade in and out. */
 .cube-ready .frame {
   position: absolute;
   z-index: 2;
@@ -56,10 +57,17 @@
 }
 .cube-ready .frame--outer { inset: 1px; width: calc(100% - 2px); height: calc(100% - 2px); }
 .cube-ready .frame--inner { inset: 9px; width: calc(100% - 18px); height: calc(100% - 18px); opacity: 0.5; }
-.frame rect {
-  stroke: rgba(176, 128, 255, 0.6);
+
+.frame__line { stroke: rgba(150, 110, 230, 0.12); stroke-width: 1; }
+.frame__trace {
+  stroke: rgba(170, 125, 255, 0.32);
   stroke-width: 1;
-  filter: drop-shadow(0 0 2px rgba(150, 95, 255, 0.7)); /* a soft neon glow, painted once */
+  stroke-dasharray: 420 680 260 900;          /* long soft segments and gaps */
+  animation: frame-drift 80s linear infinite;
+}
+.frame--inner .frame__trace { animation-duration: 110s; animation-direction: reverse; }
+@keyframes frame-drift {
+  to { stroke-dashoffset: -2260; }           /* one full pattern length, so the loop is seamless */
 }
 
 /* While turning, the lines fade out and back in, drifting towards turquoise */
