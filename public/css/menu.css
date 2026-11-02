@@ -15,7 +15,7 @@
   inset: 0;
   z-index: 30;
   overflow-y: auto;
-  background: rgba(10, 6, 17, 0.55);
+  background: rgba(10, 6, 17, 0.82);
   opacity: 0;
   visibility: hidden;
   transform: scale(1.06);
@@ -63,6 +63,34 @@
   transition: color 0.2s;
 }
 .menu__text-nav button:hover { color: var(--green); }
+
+/* ---------- Filter ---------- */
+.filter { margin-bottom: var(--space-5); }
+.filter h2 { margin-bottom: var(--space-2); }
+.filter__tags { display: flex; flex-wrap: wrap; gap: var(--space-1); }
+.filter__tag {
+  padding: 0.35em 1em;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+.filter__tag:hover { color: var(--text); border-color: var(--green); }
+.filter__tag[aria-pressed="true"] { color: var(--green); border-color: var(--green); box-shadow: 0 0 10px var(--green-glow); }
+
+.filter__results:not(:empty) { margin-top: var(--space-4); }
+.filter__list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
+.filter__item {
+  max-width: 46rem;
+  padding-left: var(--space-3);
+  border-left: 1px solid var(--green);
+}
+.filter__item p { margin: var(--space-1) 0 var(--space-2); }
+mark { background: rgba(198, 255, 26, 0.18); color: var(--text); padding: 0 0.15em; }
 
 /* ---------- The unfolded cube ----------
    Columns side by side, like the faces of the cube laid flat */

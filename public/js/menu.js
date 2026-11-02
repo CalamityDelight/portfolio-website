@@ -1,10 +1,23 @@
 // Zoom-out menu: the cube "unfolds" into a flat map of every column and level.
 // This is also the brief's post listing: each work column is a post.
-// Opens with Space, Enter or the Overview button; closes with Esc or the same keys.
+// Above the map sits the tag filter. Opens with Space, Enter or the Overview
+// button; closes with Esc or the same keys.
 
 import { esc } from './works.js';
 
-export function initMenu(nav) {
+// Wraps every match of `word` in <mark>, escaping the rest of the text
+function highlight(text, word) {
+  const pattern = new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+  let html = '';
+  let last = 0;
+  for (const match of text.matchAll(pattern)) {
+    html += esc(text.slice(last, match.index)) + `<mark>${esc(match[0])}</mark>`;
+    last = match.index + match[0].length;
+  }
+  return html + esc(text.slice(last));
+}
+
+export function initMenu(nav, works, tags) {
   const cube = document.getElementById('cube');
   const html = document.documentElement;
 
@@ -32,7 +45,13 @@ export function initMenu(nav) {
           <button class="btn menu__close" type="button">Close · Esc</button>
         </header>
         <nav aria-label="All columns"><ul class="menu__text-nav">${textNav}</ul></nav>
-        <!-- The tag filter goes here in Part 3 -->
+        <section class="filter" aria-labelledby="filter-title">
+          <h2 class="label" id="filter-title">Filter by tool, skill or role</h2>
+          <div class="filter__tags">
+            ${tags.map((tag) => `<button type="button" class="filter__tag" aria-pressed="false" data-tag="${esc(tag)}">${esc(tag)}</button>`).join('')}
+          </div>
+          <div class="filter__results" aria-live="polite"></div>
+        </section>
         <ol class="map">${map}</ol>
       </div>
     </div>`);
@@ -78,12 +97,53 @@ export function initMenu(nav) {
   menu.querySelector('.menu__close').addEventListener('click', close);
 
   // Any button with data-col jumps to that column and level
+  // (and, for "Read more", to one paragraph: data-target)
   menu.addEventListener('click', (e) => {
     const target = e.target.closest('[data-col]');
     if (!target) return;
     close();
-    nav.goTo(Number(target.dataset.col), Number(target.dataset.level));
+    nav.goTo(Number(target.dataset.col), Number(target.dataset.level), target.dataset.target);
   });
+
+  // ---------- Filter ----------
+  const results = menu.querySelector('.filter__results');
+  const tagButtons = [...menu.querySelectorAll('.filter__tag')];
+
+  // Every process block that mentions the tag, with which work it belongs to.
+  // Works are columns 1, 2, 3… in the cube (column 0 is Home).
+  function findBlocks(tag) {
+    const word = tag.toLowerCase();
+    return works.flatMap((work, w) => work.process.map((block, b) => ({
+      work,
+      col: w + 1,
+      id: `${work.slug}-block-${b}`,
+      text: block.type === 'list' ? block.items.join(' · ') : block.text,
+    }))).filter((block) => block.text.toLowerCase().includes(word));
+  }
+
+  function showResults(tag) {
+    tagButtons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tag === tag)));
+    if (!tag) { results.innerHTML = ''; return; }
+
+    const blocks = findBlocks(tag);
+    results.innerHTML = blocks.length
+      ? `<ol class="filter__list">${blocks.map((block) => {
+          const level = nav.grid[block.col].findIndex((p) => p.dataset.level === 'Process');
+          return `
+            <li class="filter__item">
+              <span class="label label--accent">${esc(block.work.title)}</span>
+              <p>${highlight(block.text, tag)}</p>
+              <button type="button" class="btn btn--quiet" data-col="${block.col}" data-level="${level}" data-target="${block.id}">Read more →</button>
+            </li>`;
+        }).join('')}</ol>`
+      : `<p class="muted">No process notes mention ${esc(tag)} yet.</p>`;
+  }
+
+  tagButtons.forEach((btn) => btn.addEventListener('click', () => {
+    // Clicking the active tag again clears the filter
+    const active = btn.getAttribute('aria-pressed') === 'true';
+    showResults(active ? null : btn.dataset.tag);
+  }));
 
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && isOpen()) { close(); return; }

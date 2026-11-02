@@ -12,11 +12,14 @@ const cube = document.getElementById('cube');
 // The field readout doesn't depend on the works, so it starts loading right away
 initField();
 
-const works = await loadWorks();
+const [works, tags] = await Promise.all([
+  loadWorks(),
+  fetch('/data/tags.json').then((res) => res.json()), // the fixed tag list for the filter
+]);
 renderWorks(works, cube);
 cube.querySelectorAll('.player').forEach(setupPlayer);
 initComments(cube);
 
 const nav = initCube(cube);
-initMenu(nav);
+initMenu(nav, works, tags);
 initAccount();

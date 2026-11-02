@@ -175,6 +175,13 @@
   color: var(--text-muted);
 }
 
+/* The paragraph "Read more" lands on glows briefly so the eye finds it */
+.process .is-highlighted { animation: found 2.6s var(--ease); }
+@keyframes found {
+  0%, 60% { box-shadow: -14px 0 0 -13px var(--green), 0 0 30px rgba(198, 255, 26, 0.12); background: rgba(198, 255, 26, 0.05); }
+  100% { box-shadow: none; background: transparent; }
+}
+
 /* ---------- References ---------- */
 .refs {
   margin-top: var(--space-4);

@@ -194,9 +194,18 @@ export function initCube(cube) {
 
   // Other parts (the zoom-out menu) move the cube through this
   return {
-    goTo(col, level = 0) {
+    // targetId (optional): an element inside the panel to scroll to and highlight,
+    // used by the filter's "Read more" to land on the exact paragraph
+    goTo(col, level = 0, targetId = null) {
       if (col === state.col) go(col, level, level >= state.level ? 'down' : 'up');
       else go(col, level, col > state.col ? 'right' : 'left');
+
+      const target = targetId && document.getElementById(targetId);
+      if (!target) return;
+      const panel = grid[col][level];
+      panel.scrollTop = Math.max(0, target.offsetTop - panel.clientHeight * 0.3);
+      target.classList.add('is-highlighted');
+      setTimeout(() => target.classList.remove('is-highlighted'), 2600);
     },
     get state() { return { col: state.col, level: state.level }; },
     columns,
