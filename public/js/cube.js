@@ -3,9 +3,9 @@
 // and only one face shows at a time. Moving turns the cube 90° in 3D:
 // left/right switches column (always landing at the top), up/down changes level.
 
-const DURATION = 1300; // ms for one turn of the cube: slow and fluid
+const DURATION = 1400; // ms for one turn of the cube: slow and calm
 
-export function initCube(cube, { particles } = {}) {
+export function initCube(cube) {
   const box = cube.querySelector('.cube__box');
   const columns = [...cube.querySelectorAll('.column')];
   const grid = columns.map((col) => [...col.querySelectorAll('.panel')]);
@@ -17,6 +17,9 @@ export function initCube(cube, { particles } = {}) {
 
   // Panels can take focus (without showing an outline) so screen readers and Tab follow along
   grid.flat().forEach((panel) => panel.setAttribute('tabindex', '-1'));
+
+  // Each face keeps its frame still and scrolls the layer inside it
+  const scroller = (panel) => panel.querySelector('.panel__inner');
 
   // ---------- Navigation bar: dots (where you are) and arrows (where you can go) ----------
   const navbar = document.querySelector('.navbar');
@@ -60,11 +63,11 @@ export function initCube(cube, { particles } = {}) {
     arrows.querySelector('.arrow--up').hidden = level === 0 && !canScroll(panel, 'up');
     arrows.querySelector('.arrow--down').hidden = level === grid[col].length - 1 && !canScroll(panel, 'down');
   }
-  grid.flat().forEach((panel) => panel.addEventListener('scroll', updateArrows, { passive: true }));
+  grid.flat().forEach((panel) => scroller(panel).addEventListener('scroll', updateArrows, { passive: true }));
 
   // Content can grow after load (comments arrive, images load), so check again whenever a panel changes size
   const resizeWatcher = new ResizeObserver(updateArrows);
-  grid.flat().forEach((panel) => resizeWatcher.observe(panel.firstElementChild));
+  grid.flat().forEach((panel) => [...scroller(panel).children].forEach((child) => resizeWatcher.observe(child)));
 
   function updateUI() {
     const { col, level } = state;
@@ -100,7 +103,7 @@ export function initCube(cube, { particles } = {}) {
     const to = grid[col][level];
 
     from.querySelectorAll('video').forEach((v) => v.pause()); // stop any video we leave
-    to.scrollTop = 0; // always land at the top
+    scroller(to).scrollTop = 0; // always land at the top
     state.col = col;
     state.level = level;
     stopHint();
@@ -118,8 +121,6 @@ export function initCube(cube, { particles } = {}) {
     const depth = (horizontal ? box.clientWidth : box.clientHeight) / 2;
     const { place, turn } = SIDES[dir];
 
-    particles?.burst(box.getBoundingClientRect(), dir, DURATION);
-    window.magneticField?.surge(); // the field swells as the cube moves through it
 
     from.style.transform = `translateZ(${depth}px)`;
     to.style.transform = `${place} translateZ(${depth}px)`;
@@ -157,15 +158,17 @@ export function initCube(cube, { particles } = {}) {
 
   // A tall face (like the CV) scrolls first; only at its edge do we change level
   function canScroll(panel, dir) {
-    if (dir === 'down') return panel.scrollTop + panel.clientHeight < panel.scrollHeight - 2;
-    return panel.scrollTop > 2;
+    const el = scroller(panel);
+    if (dir === 'down') return el.scrollTop + el.clientHeight < el.scrollHeight - 2;
+    return el.scrollTop > 2;
   }
 
   function step(dir) {
     stopHint();
     const panel = grid[state.col][state.level];
     if ((dir === 'up' || dir === 'down') && canScroll(panel, dir)) {
-      panel.scrollBy({ top: (dir === 'down' ? 1 : -1) * panel.clientHeight * 0.8, behavior: 'smooth' });
+      const el = scroller(panel);
+      el.scrollBy({ top: (dir === 'down' ? 1 : -1) * el.clientHeight * 0.8, behavior: 'smooth' });
     } else {
       move(dir);
     }
@@ -300,8 +303,8 @@ export function initCube(cube, { particles } = {}) {
 
       const target = targetId && document.getElementById(targetId);
       if (!target) return;
-      const panel = grid[col][level];
-      panel.scrollTop = Math.max(0, target.offsetTop - panel.clientHeight * 0.3);
+      const el = scroller(grid[col][level]);
+      el.scrollTop = Math.max(0, target.offsetTop - el.clientHeight * 0.3);
       target.classList.add('is-highlighted');
       setTimeout(() => target.classList.remove('is-highlighted'), 2600);
     },

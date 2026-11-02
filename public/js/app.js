@@ -6,7 +6,6 @@ import { initMenu } from './menu.js';
 import { initAccount } from './account.js';
 import { initComments } from './comments.js';
 import { initField } from './field.js';
-import { createParticles } from './particles.js';
 
 const cube = document.getElementById('cube');
 
@@ -29,7 +28,6 @@ renderWorks(works, cube.querySelector('.cube__box'));
 cube.querySelectorAll('.player').forEach(setupPlayer);
 initComments(cube);
 
-const particles = createParticles(document.getElementById('particles'));
-const nav = initCube(cube, { particles });
+const nav = initCube(cube);
 initMenu(nav, works, tags);
 initAccount();

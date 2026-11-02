@@ -19,9 +19,9 @@
   <link rel="stylesheet" href="/css/field.css">
 </head>
 <body>
-  <!-- Background: the moving magnetic field, and the still image shown when effects are off -->
-  <canvas id="fibres" aria-hidden="true"></canvas>
-  <div class="field-still" aria-hidden="true"></div>
+  <!-- Background: the still image, and the canvas that brings it to life (water.js) -->
+  <div class="backdrop" aria-hidden="true"></div>
+  <canvas id="water" aria-hidden="true"></canvas>
 
   <header class="site-header">
     <a class="logo" href="#home">Axel af Ugglas<span>AI video &amp; film</span></a>
@@ -204,14 +204,11 @@
     </div>
   </main>
 
-  <!-- Green particles thrown off the cube's edges when it turns (particles.js) -->
-  <canvas id="particles" aria-hidden="true"></canvas>
-
   <!-- Bottom centre: where you are (dots), which way you can go (arrows), and the overview cube.
        Filled by cube.js and menu.js -->
   <nav class="navbar" aria-label="Move around the site"></nav>
 
-  <script src="/js/magnetic.js"></script>
+  <script src="/js/water.js"></script>
   <script type="module" src="/js/app.js"></script>
 </body>
 </html>

@@ -187,8 +187,10 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
   white-space: nowrap;
 }
 
-/* The magnetic field canvas sits behind everything */
-#fibres {
+/* The background: the still image, and the WebGL canvas that animates it.
+   The canvas fades in over the image once it runs, and out when effects are off. */
+.backdrop,
+#water {
   position: fixed;
   inset: 0;
   width: 100%;
@@ -196,6 +198,9 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
   z-index: 0;
   pointer-events: none;
 }
+.backdrop { background: var(--bg) url('/img/background.jpg') center / cover no-repeat; }
+#water { opacity: 0; transition: opacity 1.2s; }
+#water.is-live { opacity: 1; }
 
 /* Fixed header: name left, magnetic field readout right */
 .site-header {

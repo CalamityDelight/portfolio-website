@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="/css/studio.css">
 </head>
 <body class="admin">
-  <canvas id="fibres" data-mode="still" aria-hidden="true"></canvas>
+  <div class="backdrop" aria-hidden="true"></div>
 
   <header class="site-header">
     <a class="logo" href="/">Axel af Ugglas<span>AI video &amp; film</span></a>
@@ -36,7 +36,6 @@
     </form>
   </main>
 
-  <script src="/js/magnetic.js"></script>
   <script>
     // Sends the username and password to the server; on success, go to the studio
     const form = document.getElementById('login-form');

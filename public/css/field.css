@@ -29,20 +29,6 @@
 }
 .kp__toggle:hover { color: var(--glow); border-color: var(--glow); }
 
-/* With the effects off, a still image replaces the moving field.
-   Put the Midjourney image at public/img/field-still.jpg; until then the
-   still fibre texture shows through. */
-.field-still {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  background: url('/img/field-still.jpg') center / cover no-repeat;
-  opacity: 0;
-  transition: opacity 0.8s;
-  pointer-events: none;
-}
-.field-off .field-still { opacity: 1; }
-
 @media (max-width: 900px) {
   .kp__name { display: none; }   /* "· Kp 2 · calm" is enough on small screens */
   .kp__value { margin-left: -0.3em; }
