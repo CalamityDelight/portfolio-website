@@ -12,7 +12,8 @@
 
 .player {
   position: relative;
-  width: min(100%, calc(72vh * 16 / 9));   /* never taller than 72% of the screen */
+  /* As wide as possible while video + title still fit on one screen */
+  width: min(100%, calc((100vh - 20rem) * 16 / 9));
   margin: 0 auto;
   aspect-ratio: 16 / 9;
   background: #000;

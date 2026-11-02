@@ -152,6 +152,8 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
   align-items: center;
   padding: var(--space-3) var(--space-4);
   pointer-events: none;       /* let clicks pass through the empty middle */
+  /* Soft fade so scrolling text doesn't collide with the logo */
+  background: linear-gradient(rgba(10, 6, 17, 0.85), rgba(10, 6, 17, 0));
 }
 .site-header > * { pointer-events: auto; }
 

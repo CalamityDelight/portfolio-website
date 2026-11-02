@@ -20,6 +20,8 @@
 
 .portrait-placeholder {
   aspect-ratio: 4 / 5;
+  width: min(100%, calc((100vh - 25rem) * 4 / 5));   /* keeps the intro within one screen */
+  margin-left: auto;
   border: 1px solid var(--line);
   background:
     radial-gradient(ellipse at 30% 25%, rgba(123, 77, 255, 0.28), transparent 60%),

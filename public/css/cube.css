@@ -1,0 +1,106 @@
+/* Cube navigation. Only applies once cube.js has run (html.cube-ready),
+   so without JavaScript the site is still one long readable page. */
+
+.cube-ready body { overflow: hidden; }
+
+.cube-ready .cube {
+  position: fixed;
+  inset: 0;
+  perspective: 1600px;          /* gives the roller rotation its depth */
+}
+
+/* Every panel fills the screen, stacked on top of each other; only the active one shows */
+.cube-ready .panel {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;             /* tall panels like the CV scroll inside themselves */
+  overscroll-behavior: contain;
+  touch-action: pan-y;          /* horizontal swipes are ours, vertical ones scroll */
+  visibility: hidden;
+  backface-visibility: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--purple-dim) transparent;
+}
+.cube-ready .panel.is-active { visibility: visible; }
+.cube-ready .panel:focus { outline: none; }
+.cube-ready .panel__inner { padding-bottom: var(--space-6); } /* room for the arrows and dots */
+
+/* ---------- Roller transitions ----------
+   The old panel rolls away and the new one rolls in from the opposite side,
+   a small turn plus a slide, like the face of a cube turning. */
+.enter-down  { animation: from-below 0.7s var(--ease) both; }
+.exit-down   { animation: to-above   0.7s var(--ease) both; }
+.enter-up    { animation: from-above 0.7s var(--ease) both; }
+.exit-up     { animation: to-below   0.7s var(--ease) both; }
+.enter-right { animation: from-right 0.7s var(--ease) both; }
+.exit-right  { animation: to-left    0.7s var(--ease) both; }
+.enter-left  { animation: from-left  0.7s var(--ease) both; }
+.exit-left   { animation: to-right   0.7s var(--ease) both; }
+
+@keyframes from-below { from { opacity: 0; transform: translateY(35%) rotateX(-14deg); } }
+@keyframes to-above   { to   { opacity: 0; transform: translateY(-35%) rotateX(14deg); } }
+@keyframes from-above { from { opacity: 0; transform: translateY(-35%) rotateX(14deg); } }
+@keyframes to-below   { to   { opacity: 0; transform: translateY(35%) rotateX(-14deg); } }
+@keyframes from-right { from { opacity: 0; transform: translateX(35%) rotateY(14deg); } }
+@keyframes to-left    { to   { opacity: 0; transform: translateX(-35%) rotateY(-14deg); } }
+@keyframes from-left  { from { opacity: 0; transform: translateX(-35%) rotateY(-14deg); } }
+@keyframes to-right   { to   { opacity: 0; transform: translateX(35%) rotateY(14deg); } }
+
+/* ---------- On-screen arrows ----------
+   Laid out like the arrow keys, bottom right, echoing the hint on the intro */
+.arrows {
+  position: fixed;
+  right: var(--space-4);
+  bottom: var(--space-3);
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(3, 2.2rem);
+  grid-template-rows: repeat(2, 2.2rem);
+  gap: 4px;
+}
+.arrow {
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(198, 255, 26, 0.45);
+  border-radius: 6px;
+  background: rgba(10, 6, 17, 0.5);
+  color: var(--green);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.arrow:hover { border-color: var(--green); box-shadow: 0 0 12px var(--green-glow); }
+.arrow[hidden] { display: grid; visibility: hidden; } /* keep the key layout steady */
+.arrow--up { grid-column: 2; grid-row: 1; }
+.arrow--left { grid-column: 1; grid-row: 2; }
+.arrow--down { grid-column: 2; grid-row: 2; }
+.arrow--right { grid-column: 3; grid-row: 2; }
+
+/* ---------- Dot indicator ----------
+   One small stack of dots per column; the green dot is where you are */
+.dots {
+  position: fixed;
+  left: var(--space-4);
+  bottom: var(--space-3);
+  z-index: 20;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  pointer-events: none;
+}
+.dots__col { display: flex; flex-direction: column; gap: 5px; opacity: 0.45; transition: opacity 0.3s; }
+.dots__col.is-current { opacity: 1; }
+.dots i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.dots i.is-active { background: var(--green); box-shadow: 0 0 8px var(--green-glow); }
+
+@media (max-width: 700px) {
+  .arrows { right: var(--space-2); bottom: var(--space-2); grid-template-columns: repeat(3, 2rem); grid-template-rows: repeat(2, 2rem); }
+  .dots { left: var(--space-3); bottom: var(--space-2); }
+}
