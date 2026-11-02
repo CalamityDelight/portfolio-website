@@ -157,9 +157,10 @@
     align-items: start;
     gap: var(--space-3);
   }
-  .intro__image { grid-column: 1; grid-row: 1; padding-top: 0; width: 48%; justify-self: end; }
+  .intro__image { grid-column: 1; grid-row: 1; padding-top: 0; width: 38%; justify-self: end; }
   .intro__text { grid-column: 1; grid-row: 2; padding-bottom: 0; }
-  .intro__hint { grid-row: 3; }
+  .intro__text .lead { font-size: 1.125rem; }
+  .intro__hint { grid-row: 3; gap: var(--space-2); }
 
   .cv__section { grid-template-columns: 1fr; gap: var(--space-2); }
   .cv__list li { grid-template-columns: 1fr; gap: 0; }

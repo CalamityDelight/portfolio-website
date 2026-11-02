@@ -21,7 +21,7 @@ export async function loadWorks() {
 function videoPanel(work) {
   const media = work.video_url
     ? `<div class="player">
-         <video src="${esc(work.video_url)}" preload="metadata" playsinline></video>
+         <video src="${esc(work.video_url)}" preload="metadata" playsinline aria-label="Video: ${esc(work.title)}"></video>
        </div>`
     : `<div class="player player--empty"><span class="label">Video coming soon</span></div>`;
 

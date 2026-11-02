@@ -12,10 +12,18 @@ const cube = document.getElementById('cube');
 // The field readout doesn't depend on the works, so it starts loading right away
 initField();
 
-const [works, tags] = await Promise.all([
-  loadWorks(),
-  fetch('/data/tags.json').then((res) => res.json()), // the fixed tag list for the filter
-]);
+let works = [];
+let tags = [];
+try {
+  [works, tags] = await Promise.all([
+    loadWorks(),
+    fetch('/data/tags.json').then((res) => res.json()), // the fixed tag list for the filter
+  ]);
+} catch {
+  // Database or network down: Home and the CV still work, with a short note on the intro
+  document.querySelector('.intro__hint').insertAdjacentHTML('beforeend',
+    '<p class="label">The works could not be loaded right now. Please try again later.</p>');
+}
 renderWorks(works, cube);
 cube.querySelectorAll('.player').forEach(setupPlayer);
 initComments(cube);

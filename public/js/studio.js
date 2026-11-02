@@ -335,6 +335,13 @@ form.addEventListener('submit', async (e) => {
     form.title.focus();
     return;
   }
+  // Alt text describes an image to people who can't see it, so every image needs one
+  const missingAlt = images.findIndex((img) => !img.alt.trim());
+  if (missingAlt !== -1) {
+    showMessage('Add an alt text to every reference image before saving.');
+    document.getElementById(`alt-${missingAlt}`).focus();
+    return;
+  }
 
   const body = {
     title: form.title.value,
