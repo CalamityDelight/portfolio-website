@@ -23,13 +23,13 @@
   resize: vertical;
 }
 .field input:focus,
-.field textarea:focus { outline: none; border-bottom-color: var(--green); }
+.field textarea:focus { outline: none; border-bottom-color: var(--glow); }
 
 .stack { display: flex; flex-direction: column; gap: var(--space-3); align-items: stretch; }
 .stack .btn { align-self: flex-start; }
 
 .form-message { min-height: 1.5em; margin: 0; color: #ff9db0; font-size: 0.95rem; }
-.form-message.is-ok { color: var(--green); }
+.form-message.is-ok { color: var(--glow); }
 
 /* ---------- Login ---------- */
 .login {
@@ -45,7 +45,7 @@
 
 /* ---------- Studio ---------- */
 .studio-actions { display: flex; gap: var(--space-1); }
-.btn--quiet { border-color: rgba(198, 255, 26, 0.5); }
+.btn--quiet { border-color: rgba(94, 240, 196, 0.5); }
 .btn--danger { border-color: #ff9db0; color: #ff9db0; margin-right: auto; }
 .btn--danger:hover { background: #ff9db0; color: var(--bg); box-shadow: none; }
 .btn:disabled { opacity: 0.4; cursor: default; }
@@ -53,7 +53,7 @@
 /* A file input hidden inside a pill button, so it looks like the other buttons */
 .btn--file { position: relative; align-self: flex-start; }
 .btn--file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-.btn--file:focus-within { outline: 1px solid var(--green); outline-offset: 4px; }
+.btn--file:focus-within { outline: 1px solid var(--glow); outline-offset: 4px; }
 
 .studio {
   max-width: 64rem;
@@ -79,7 +79,7 @@
   padding: var(--space-2) 0;
   border-bottom: 1px solid var(--line);
 }
-.work-list__item.is-current { border-bottom-color: var(--green); }
+.work-list__item.is-current { border-bottom-color: var(--glow); }
 .work-list__pos { font-size: var(--size-label); color: var(--text-muted); font-variant-numeric: tabular-nums; }
 .work-list__title small { margin-left: var(--space-2); font-size: var(--size-label); color: var(--text-muted); }
 
@@ -88,7 +88,7 @@
   gap: var(--space-4);
   padding: var(--space-4);
   border: 1px solid var(--line);
-  border-top: 1px solid var(--green);
+  border-top: 1px solid var(--glow);
   background: rgba(18, 11, 30, 0.75);
 }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
@@ -107,8 +107,8 @@
 
 progress { width: 100%; height: 2px; appearance: none; border: 0; background: var(--line); }
 progress::-webkit-progress-bar { background: var(--line); }
-progress::-webkit-progress-value { background: var(--green); }
-progress::-moz-progress-bar { background: var(--green); }
+progress::-webkit-progress-value { background: var(--glow); }
+progress::-moz-progress-bar { background: var(--glow); }
 
 .video-preview { width: 100%; max-height: 22rem; background: #000; border: 1px solid var(--line); }
 
@@ -117,7 +117,7 @@ progress::-moz-progress-bar { background: var(--green); }
 
 /* Process blocks */
 .blocks, .images { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
-.block { border-left: 1px solid var(--green); padding-left: var(--space-2); }
+.block { border-left: 1px solid var(--glow); padding-left: var(--space-2); }
 .block__head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; }
 .block__tools button {
   width: 2rem;
@@ -128,7 +128,7 @@ progress::-moz-progress-bar { background: var(--green); }
   color: var(--text-muted);
   cursor: pointer;
 }
-.block__tools button:hover:not(:disabled) { color: var(--green); border-color: var(--green); }
+.block__tools button:hover:not(:disabled) { color: var(--glow); border-color: var(--glow); }
 .block__tools button:disabled { opacity: 0.3; cursor: default; }
 .block textarea {
   width: 100%;
@@ -140,7 +140,7 @@ progress::-moz-progress-bar { background: var(--green); }
   font-size: 1rem;
   resize: vertical;
 }
-.block textarea:focus { outline: none; border-color: var(--green); }
+.block textarea:focus { outline: none; border-color: var(--glow); }
 
 /* Reference images */
 .image { display: grid; grid-template-columns: 8rem 1fr auto; gap: var(--space-2); align-items: end; }
@@ -151,13 +151,13 @@ progress::-moz-progress-bar { background: var(--green); }
   display: grid;
   gap: var(--space-1);
   padding: var(--space-2) var(--space-3);
-  border-left: 1px solid var(--green);
-  background: rgba(198, 255, 26, 0.03);
+  border-left: 1px solid var(--glow);
+  background: rgba(94, 240, 196, 0.03);
 }
 .approved__text { margin: 0; max-width: none; white-space: pre-line; color: var(--text-muted); }
 .approved .btn { justify-self: start; }
 #f-draft { border: 1px solid var(--line); padding: var(--space-1); font-size: 1rem; }
-#f-draft:focus { border-color: var(--green); }
+#f-draft:focus { border-color: var(--glow); }
 
 /* Tags as toggle pills */
 .tag-picker { display: flex; flex-wrap: wrap; gap: var(--space-1); }
@@ -171,8 +171,8 @@ progress::-moz-progress-bar { background: var(--green); }
   color: var(--text-muted);
   cursor: pointer;
 }
-.tag-option input:checked + span { border-color: var(--green); color: var(--green); }
-.tag-option input:focus-visible + span { outline: 1px solid var(--green); outline-offset: 3px; }
+.tag-option input:checked + span { border-color: var(--glow); color: var(--glow); }
+.tag-option input:focus-visible + span { outline: 1px solid var(--glow); outline-offset: 3px; }
 
 @media (max-width: 700px) {
   .studio { padding: var(--space-6) var(--space-3) var(--space-4); }

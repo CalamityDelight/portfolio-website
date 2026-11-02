@@ -1,35 +1,19 @@
 /* Home column: intro and CV */
 
 /* ---------- Intro ----------
-   One card, centred in the cube's face: text left, portrait right. */
+   Text and portrait side by side, centred and floating in the field: no box. */
 .intro {
   min-height: 100%;
   display: grid;
   place-items: center;
 }
 .intro__card {
-  position: relative;
-  width: min(100%, 52rem);
+  width: min(100%, 50rem);
   display: grid;
-  grid-template-columns: 1.35fr 1fr;
+  grid-template-columns: 1.4fr 1fr;
   align-items: center;
-  gap: var(--space-5);
-  padding: var(--space-5);
-  border: 1px solid var(--line);
-  background: linear-gradient(140deg, rgba(123, 77, 255, 0.08), rgba(7, 4, 13, 0.4) 60%);
+  gap: var(--space-6);
 }
-/* Neon corner marks, like the frame of a viewfinder */
-.intro__card::before,
-.intro__card::after {
-  content: '';
-  position: absolute;
-  width: 1.4rem;
-  height: 1.4rem;
-  border: 1px solid var(--green);
-  animation: neon-box 4.5s ease-in-out infinite;
-}
-.intro__card::before { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
-.intro__card::after { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
 
 .intro__text h1 { margin: var(--space-2) 0 var(--space-3); }
 .intro__text .lead { margin: 0; color: var(--text-muted); }
@@ -37,9 +21,10 @@
 .intro__image { margin: 0; }
 .portrait-placeholder {
   aspect-ratio: 4 / 5;
-  border: 1px solid var(--line);
+  max-height: 55cqh;            /* never taller than about half the screen */
   background:
-    radial-gradient(ellipse at 30% 25%, rgba(123, 77, 255, 0.3), transparent 60%),
+    radial-gradient(ellipse at 30% 25%, rgba(122, 82, 216, 0.35), transparent 60%),
+    radial-gradient(ellipse at 70% 90%, rgba(94, 240, 196, 0.12), transparent 55%),
     linear-gradient(160deg, var(--bg-raised), var(--bg));
   display: flex;
   align-items: flex-end;
@@ -114,16 +99,16 @@
   gap: var(--space-2) var(--space-4);
 }
 .contact a {
-  color: var(--green);
+  color: var(--glow);
   text-decoration: none;
   border-bottom: 1px solid transparent;
   transition: border-color 0.2s;
 }
-.contact a:hover { border-bottom-color: var(--green); }
+.contact a:hover { border-bottom-color: var(--glow); }
 
 /* ---------- Phones and narrow screens ---------- */
 @media (max-width: 800px) {
-  .intro__card { grid-template-columns: 1fr; gap: var(--space-3); padding: var(--space-4) var(--space-3); }
+  .intro__card { grid-template-columns: 1fr; gap: var(--space-4); }
   .intro__image { order: -1; width: 42%; }
 
   .cv__section { grid-template-columns: 1fr; gap: var(--space-2); }

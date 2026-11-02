@@ -1,17 +1,18 @@
 /* Design system: every colour, size and space lives in these variables,
    so the whole look can be tuned from one place. */
 :root {
-  /* Colours */
-  --bg: #07040d;              /* near-black with a purple tint */
-  --bg-raised: #110a1c;       /* panels that sit slightly above the background */
-  --face: rgba(9, 5, 16, 0.9); /* the cube's faces: dark, a hint of the field shows through */
-  --purple: #7b4dff;          /* the magnetic field and quiet details */
-  --purple-dim: #3a2470;
-  --text: #ece7f5;            /* off-white is softer on dark than pure white */
-  --text-muted: #a69cba;
-  --line: rgba(236, 231, 245, 0.12);
-  --green: #c6ff1a;           /* acid neon: navigation, buttons, thin lines, motion */
-  --green-glow: rgba(198, 255, 26, 0.35);
+  /* Colours: dark mystic purple, with turquoise that glows like bioluminescence */
+  --bg: #0b0711;              /* near-black with a deep purple tint */
+  --bg-raised: #150d1f;
+  --face: rgba(12, 7, 20, 0.6); /* the cube's faces while turning */
+  --purple: #7a52d8;          /* the magnetic field and quiet details */
+  --purple-dim: #3b2766;
+  --text: #ece6f4;            /* off-white is softer on dark than pure white */
+  --text-muted: #a297b5;
+  --line: rgba(236, 230, 244, 0.1);
+  --glow: #5ef0c4;            /* bioluminescent turquoise: navigation, buttons, lines, motion */
+  --glow-soft: rgba(94, 240, 196, 0.35);
+  --mint: #c4f8e2;            /* the palest glow, for small highlights */
 
   /* Type: smaller and airier than before, body still a comfortable 16px (brief task 3) */
   --font: 'Montserrat', system-ui, sans-serif;
@@ -83,23 +84,18 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
 .lead { font-size: var(--size-lead); font-weight: 300; }
 .muted { color: var(--text-muted); }
 
-/* ---------- Neon ----------
-   Green is a light source, not a flat colour: it glows, breathes slowly and
-   flickers now and then, like a neon tube. Kept faint so text stays calm. */
+/* ---------- Bioluminescence ----------
+   The turquoise is a light, not a flat colour: it glows and slowly swells and
+   fades, like plankton lighting up in dark water. Kept faint so text stays calm. */
 @keyframes neon-breathe {
-  0%, 100% { text-shadow: 0 0 3px rgba(198, 255, 26, 0.45), 0 0 10px rgba(198, 255, 26, 0.15); }
-  50%      { text-shadow: 0 0 5px rgba(198, 255, 26, 0.7), 0 0 18px rgba(198, 255, 26, 0.3); }
-}
-@keyframes neon-flicker {
-  0%, 41%, 43%, 77%, 79%, 100% { opacity: 1; }
-  42% { opacity: 0.78; }
-  78% { opacity: 0.9; }
+  0%, 100% { text-shadow: 0 0 4px rgba(94, 240, 196, 0.35), 0 0 12px rgba(94, 240, 196, 0.12); }
+  50%      { text-shadow: 0 0 6px rgba(94, 240, 196, 0.6), 0 0 22px rgba(94, 240, 196, 0.28); }
 }
 @keyframes neon-box {
-  0%, 100% { box-shadow: 0 0 4px rgba(198, 255, 26, 0.3), inset 0 0 4px rgba(198, 255, 26, 0.1); }
-  50%      { box-shadow: 0 0 12px rgba(198, 255, 26, 0.45), inset 0 0 8px rgba(198, 255, 26, 0.2); }
+  0%, 100% { box-shadow: 0 0 5px rgba(94, 240, 196, 0.22), inset 0 0 5px rgba(94, 240, 196, 0.08); }
+  50%      { box-shadow: 0 0 16px rgba(94, 240, 196, 0.4), inset 0 0 10px rgba(94, 240, 196, 0.16); }
 }
-/* A bright spot that runs along a border, so outlines look like flowing light */
+/* A bright spot that drifts along a border, so outlines look like flowing light */
 @keyframes neon-flow {
   from { background-position: 150% 0; }
   to   { background-position: -50% 0; }
@@ -107,8 +103,8 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
 
 .label--accent,
 .neon {
-  color: var(--green);
-  animation: neon-breathe 4.5s ease-in-out infinite, neon-flicker 9s linear infinite;
+  color: var(--glow);
+  animation: neon-breathe 6s ease-in-out infinite;
 }
 
 /* Thin outlined pill button, glowing like neon */
@@ -118,10 +114,10 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
   align-items: center;
   gap: var(--space-1);
   padding: 0.6em 1.5em;
-  border: 1px solid rgba(198, 255, 26, 0.7);
+  border: 1px solid rgba(94, 240, 196, 0.7);
   border-radius: var(--radius-pill);
   background: transparent;
-  color: var(--green);
+  color: var(--glow);
   font: inherit;
   font-size: var(--size-label);
   font-weight: 500;
@@ -129,7 +125,7 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
   letter-spacing: var(--track-label);
   text-decoration: none;
   cursor: pointer;
-  animation: neon-box 4.5s ease-in-out infinite;
+  animation: neon-box 6s ease-in-out infinite;
   transition: background 0.25s, color 0.25s;
 }
 .btn::after {
@@ -138,25 +134,25 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
   inset: -1px;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(100deg, transparent 35%, rgba(240, 255, 190, 0.95) 50%, transparent 65%) 0 0 / 300% 100%;
+  background: linear-gradient(100deg, transparent 35%, rgba(205, 255, 236, 0.95) 50%, transparent 65%) 0 0 / 300% 100%;
   /* Show the gradient only on the 1px border ring */
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-  animation: neon-flow 6s linear infinite;
+  animation: neon-flow 8s ease-in-out infinite;
   pointer-events: none;
 }
-.btn--quiet { border-color: rgba(198, 255, 26, 0.45); animation: none; }
+.btn--quiet { border-color: rgba(94, 240, 196, 0.45); animation: none; }
 .btn--quiet::after { display: none; }
 .btn:hover {
-  background: var(--green);
+  background: var(--glow);
   color: var(--bg);
-  box-shadow: 0 0 22px var(--green-glow);
+  box-shadow: 0 0 22px var(--glow-soft);
 }
 
 /* Visible keyboard focus everywhere, in the accent colour */
 :focus-visible {
-  outline: 1px solid var(--green);
+  outline: 1px solid var(--glow);
   outline-offset: 4px;
 }
 
@@ -201,7 +197,7 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
   text-decoration: none;
   line-height: 1.5;
 }
-.logo span { display: block; font-weight: 400; color: var(--green); opacity: 0.85; }
+.logo span { display: block; font-weight: 400; color: var(--glow); opacity: 0.8; }
 
 /* Discreet footer at the bottom of the CV */
 .site-footer {
@@ -230,7 +226,7 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
   cursor: pointer;
   transition: opacity 0.2s, color 0.2s;
 }
-.footer-link:hover { opacity: 1; color: var(--green); }
+.footer-link:hover { opacity: 1; color: var(--glow); }
 
 /* Content sits above the field */
 .cube { position: relative; z-index: 1; }

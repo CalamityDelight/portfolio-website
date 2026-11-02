@@ -11,7 +11,7 @@
 .player {
   position: relative;
   /* As wide as possible while video + title still fit in the cube's face (cqh = % of face height) */
-  width: min(100%, calc((100cqh - 14rem) * 16 / 9));
+  width: min(100%, calc((100cqh - 18rem) * 16 / 9));
   margin: 0 auto;
   aspect-ratio: 16 / 9;
   background: #000;
@@ -34,15 +34,15 @@
   margin: auto;
   width: 4.5rem;
   height: 4.5rem;
-  border: 1px solid var(--green);
+  border: 1px solid var(--glow);
   border-radius: 50%;
   background: rgba(10, 6, 17, 0.4);
-  color: var(--green);
+  color: var(--glow);
   font-size: 1.1rem;
   cursor: pointer;
   transition: opacity 0.3s, box-shadow 0.3s;
 }
-.player__big:hover { box-shadow: 0 0 24px var(--green-glow); }
+.player__big:hover { box-shadow: 0 0 24px var(--glow-soft); }
 .player.is-playing .player__big { opacity: 0; pointer-events: none; }
 
 /* Thin control bar along the bottom; fades in on hover or keyboard focus */
@@ -66,7 +66,7 @@
   background: none;
   border: 0;
   padding: 0.25rem;
-  color: var(--green);
+  color: var(--glow);
   font: inherit;
   font-size: var(--size-label);
   letter-spacing: var(--track-label);
@@ -80,26 +80,26 @@
   white-space: nowrap;
 }
 
-/* Seek slider drawn as a thin line, green up to the current time */
+/* Seek slider drawn as a thin line, glowing up to the current time */
 .player__seek {
   flex: 1;
   -webkit-appearance: none;
   appearance: none;
   height: 2px;
-  background: linear-gradient(90deg, var(--green) var(--progress, 0%), var(--line) var(--progress, 0%));
+  background: linear-gradient(90deg, var(--glow) var(--progress, 0%), var(--line) var(--progress, 0%));
   cursor: pointer;
 }
 .player__seek::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 10px; height: 10px;
   border-radius: 50%;
-  background: var(--green);
+  background: var(--glow);
 }
 .player__seek::-moz-range-thumb {
   width: 10px; height: 10px;
   border: 0;
   border-radius: 50%;
-  background: var(--green);
+  background: var(--glow);
 }
 
 .work-title {
@@ -118,12 +118,10 @@
 
 /* ---------- AI summary ---------- */
 .summary {
-  max-width: 44rem;
-  margin-left: auto;                 /* pushed right: asymmetric placement */
-  padding: var(--space-4);
-  border: 1px solid var(--line);
-  border-left: 1px solid var(--green);
-  background: linear-gradient(120deg, rgba(123, 77, 255, 0.1), rgba(10, 6, 17, 0.6));
+  max-width: 40rem;
+  margin-left: auto;                 /* pushed right: asymmetric placement, floating free */
+  padding-left: var(--space-4);
+  border-left: 1px solid rgba(94, 240, 196, 0.4);
 }
 .summary__head {
   display: flex;
@@ -136,7 +134,7 @@
   flex: 1;
   height: 14px;
   background:
-    linear-gradient(var(--green), var(--green)) 0 50% / 100% 1px no-repeat,
+    linear-gradient(var(--glow), var(--glow)) 0 50% / 100% 1px no-repeat,
     repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 12px);
   opacity: 0.5;
 }
@@ -169,7 +167,7 @@
   margin: 0 0 var(--space-3) 12%;
   padding: 0;
   list-style: none;
-  border-left: 1px solid var(--green);
+  border-left: 1px solid var(--glow);
 }
 .process__list li {
   padding: 0.35rem 0 0.35rem var(--space-3);
@@ -179,7 +177,7 @@
 /* The paragraph "Read more" lands on glows briefly so the eye finds it */
 .process .is-highlighted { animation: found 2.6s var(--ease); }
 @keyframes found {
-  0%, 60% { box-shadow: -14px 0 0 -13px var(--green), 0 0 30px rgba(198, 255, 26, 0.12); background: rgba(198, 255, 26, 0.05); }
+  0%, 60% { box-shadow: -14px 0 0 -13px var(--glow), 0 0 30px rgba(94, 240, 196, 0.12); background: rgba(94, 240, 196, 0.05); }
   100% { box-shadow: none; background: transparent; }
 }
 
@@ -226,7 +224,7 @@
 .comment__body { margin: 0; white-space: pre-line; } /* keeps the commenter's line breaks */
 .field__note { text-transform: none; letter-spacing: 0; }
 .form-message { min-height: 1.5em; margin: 0; color: #ff9db0; font-size: 0.95rem; }
-.form-message.is-ok { color: var(--green); }
+.form-message.is-ok { color: var(--glow); }
 
 .comment-form {
   display: grid;
@@ -253,12 +251,12 @@
   resize: vertical;
 }
 .field input:focus,
-.field textarea:focus { outline: none; border-bottom-color: var(--green); }
+.field textarea:focus { outline: none; border-bottom-color: var(--glow); }
 .comment-form .btn { justify-self: start; }
 
 /* ---------- Phones ---------- */
 @media (max-width: 700px) {
-  .summary { padding: var(--space-3); }
+  .summary { padding-left: var(--space-3); }
   .process > *, .process__list { margin-left: 0; }
   .comment-form { grid-template-columns: 1fr; }
   .player__full { display: none; }   /* phones open full screen from the video itself */
