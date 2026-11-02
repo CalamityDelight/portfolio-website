@@ -1,5 +1,5 @@
-// Earth's magnetic field: the header readout and its tiny vibrating circle.
-// The circle trembles faster and harder as the field gets more disturbed (Kp 0–9).
+// Earth's magnetic field: the header readout and its tiny pulsing circle.
+// The circle pulses faster as the field gets more disturbed (Kp 0–9).
 // The same Kp value also makes the background vapour flow a little faster.
 
 export async function initField() {
@@ -27,9 +27,8 @@ export async function initField() {
 
     const intensity = Math.min(data.exact, 9) / 9; // Kp 0–9 becomes 0–1
     window.magneticField.setIntensity(intensity);
-    // Calm: a slow, small tremble. Storm: fast and wide. (Used by field.css.)
-    root.style.setProperty('--vibe-speed', `${(0.9 - 0.72 * intensity).toFixed(2)}s`);
-    root.style.setProperty('--vibe-amp', `${(0.35 + 1.4 * intensity).toFixed(2)}px`);
+    // Calm: a slow pulse (2.4 s). Storm: quick (0.6 s). Used by field.css.
+    root.style.setProperty('--pulse-speed', `${(2.4 - 1.8 * intensity).toFixed(2)}s`);
   } catch {
     value.textContent = '· no reading';
   }

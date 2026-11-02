@@ -21,9 +21,8 @@ export function initCube(cube) {
   // Each face keeps its frame still and scrolls the layer inside it
   const scroller = (panel) => panel.querySelector('.panel__inner');
 
-  // The cube's frame: two thin rectangles on every face, so the lines turn with it.
-  // Each has a faint solid line, and brighter segments that drift around it (cube.css).
-  const frameRect = '<rect class="frame__base" width="100%" height="100%" /><rect class="frame__glow" width="100%" height="100%" />';
+  // The cube's frame: two thin rectangles on every face, so the lines turn with it (cube.css)
+  const frameRect = '<rect width="100%" height="100%" />';
   grid.flat().forEach((panel) => panel.insertAdjacentHTML('afterbegin', `
     <svg class="frame frame--outer" aria-hidden="true">${frameRect}</svg>
     <svg class="frame frame--inner" aria-hidden="true">${frameRect}</svg>`));

@@ -46,8 +46,7 @@
 .cube-ready .panel:focus { outline: none; }
 
 /* The double frame, drawn on top of each face so it turns with it.
-   A faint line is always there; brighter neon segments drift around it, so the
-   frame seems to be rebuilt by lines appearing and disappearing. */
+   It stays still; it only fades and shifts colour while the cube turns. */
 .cube-ready .frame {
   position: absolute;
   z-index: 2;
@@ -56,27 +55,11 @@
   fill: none;
 }
 .cube-ready .frame--outer { inset: 1px; width: calc(100% - 2px); height: calc(100% - 2px); }
-.cube-ready .frame--inner { inset: 9px; width: calc(100% - 18px); height: calc(100% - 18px); opacity: 0.6; }
-
-.frame__base { stroke: rgba(160, 110, 255, 0.2); stroke-width: 1; }
-.frame__glow {
-  stroke: rgba(186, 140, 255, 0.9);
+.cube-ready .frame--inner { inset: 9px; width: calc(100% - 18px); height: calc(100% - 18px); opacity: 0.5; }
+.frame rect {
+  stroke: rgba(176, 128, 255, 0.6);
   stroke-width: 1;
-  filter: drop-shadow(0 0 3px rgba(160, 100, 255, 0.9));
-  stroke-dasharray: 260 70 40 120 380 40 90 160;   /* lit segments and gaps, repeated */
-  animation: frame-drift 22s linear infinite, frame-shimmer 7s ease-in-out infinite;
-}
-.frame--inner .frame__glow {
-  stroke-dasharray: 120 200 300 90 60 140;
-  animation-direction: reverse, normal;
-  animation-duration: 30s, 9s;
-}
-@keyframes frame-drift {
-  to { stroke-dashoffset: -1160; }  /* one full pattern length, so the loop is seamless */
-}
-@keyframes frame-shimmer {
-  0%, 100% { stroke-opacity: 0.85; }
-  50% { stroke-opacity: 0.45; }
+  filter: drop-shadow(0 0 2px rgba(150, 95, 255, 0.7)); /* a soft neon glow, painted once */
 }
 
 /* While turning, the lines fade out and back in, drifting towards turquoise */
@@ -87,7 +70,7 @@
 }
 .cube-ready.is-turning .frame--inner { animation-name: frame-turn-inner; }
 @keyframes frame-turn-inner {
-  0%, 100% { opacity: 0.6; }
+  0%, 100% { opacity: 0.5; }
   55% { opacity: 0.1; }
 }
 

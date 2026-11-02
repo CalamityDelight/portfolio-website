@@ -168,9 +168,9 @@ mark { background: rgba(94, 240, 196, 0.18); color: var(--text); padding: 0 0.15
   width: var(--s);
   height: var(--s);
   transform-style: preserve-3d;
-  animation: mini-sway 7s ease-in-out infinite alternate;
+  animation: mini-sway 12s ease-in-out infinite alternate;
 }
-.overview:hover .mini-cube { animation-duration: 1.6s; }
+.overview:hover .mini-cube { animation-duration: 4s; }
 @keyframes mini-sway {
   from { transform: rotateX(-24deg) rotateY(-35deg); }
   to   { transform: rotateX(-16deg) rotateY(55deg); }
@@ -178,10 +178,21 @@ mark { background: rgba(94, 240, 196, 0.18); color: var(--text); padding: 0 0.15
 .mini-cube__face {
   position: absolute;
   inset: 0;
-  border: 1px solid rgba(150, 110, 230, 0.45);  /* quiet dark purple, like the frame */
-  background: rgba(90, 50, 170, 0.06);
+  border: 1px solid rgba(150, 110, 230, 0.6);  /* quiet dark purple, like the frame */
+  /* Each face fades in and out at its own time, so the cube looks like it is
+     slowly being built from lines */
+  animation: mini-build 6s ease-in-out infinite;
 }
-.overview:hover .mini-cube__face { border-color: rgba(168, 128, 245, 0.8); }
+.mini-cube__face--back { animation-delay: -1s; }
+.mini-cube__face--right { animation-delay: -2s; }
+.mini-cube__face--left { animation-delay: -3s; }
+.mini-cube__face--top { animation-delay: -4s; }
+.mini-cube__face--bottom { animation-delay: -5s; }
+@keyframes mini-build {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 1; }
+}
+.overview:hover .mini-cube__face { border-color: rgba(178, 136, 255, 0.95); }
 .mini-cube__face--front  { transform: translateZ(calc(var(--s) / 2)); }
 .mini-cube__face--back   { transform: rotateY(180deg) translateZ(calc(var(--s) / 2)); }
 .mini-cube__face--right  { transform: rotateY(90deg) translateZ(calc(var(--s) / 2)); }

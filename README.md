@@ -16,12 +16,12 @@ Built for the Berghs individual blog project (Programming & Methods, ACE2627).
 | 2 PD | Comments stored in a database | Visitors comment at the bottom of each post. First name, last name and email are required; comments are saved in Neon and appear at once. Only the first name is shown. |
 | 3 | Readable text, large and small screens | 18 px body text (17 px on phones), small labels, layouts tested from 375 px phones to 1920 px screens. Swipe navigation on touch screens. |
 | 4 | Search, filter or theme switcher | **Tag filter** in the Overview menu: pick a tool, skill or role to see every process paragraph that mentions it, labelled by work. "Read more" opens the work at that paragraph. |
-| 5 | External API | **NOAA Kp index** (Earth's magnetic field). The header shows "Earth's magnetic field · Kp 2 · calm" next to a tiny purple circle that trembles faster and wider as Kp rises from 0 to 9; the background vapour also flows a little faster in a disturbed field. |
+| 5 | External API | **NOAA Kp index** (Earth's magnetic field). The header shows "Earth's magnetic field · Kp 2 · calm" next to a tiny purple circle that pulses faster as Kp rises from 0 to 9; the background vapour also flows a little faster in a disturbed field. |
 | 6 | Sign in, sign out; sign-in required to add posts | Discreet **login** link at the bottom of the CV. Username and password, bcrypt-hashed, kept in a session cookie. All write routes check the session. |
 | 7 PD | AI API | **Automatic summary** (option d) with Claude through the Anthropic API. In the studio Axel generates a draft from the title, process and tags, edits it and approves it. Only the approved text is published, under the video. |
 | 8 PD | Posts and comments in Neon | Posts, comments and the login live in Neon Postgres (`db/schema.sql`). |
 
-Other features: the site is a 3D cube drawn with thin neon-purple double lines that drift and rebuild themselves (90% of the screen, full screen on phones) and turns 90° when you move; the background image comes alive with WebGL: turquoise vapour seeps in from the edges like paint in dark water, the mouse stirs up veins of turquoise light beneath the surface, and a click drops a small bloom of turquoise ink that dissolves; navigation by arrow keys, phone swipes and two-finger trackpad swipes; a navigation bar with a dot indicator, arrow keys and a small overview cube; a custom video player; and uploads of video and reference images to Cloudinary from the studio.
+Other features: the site is a 3D cube drawn with thin neon-purple double lines (90% of the screen, full screen on phones) that turns 90° when you move; the background image comes alive with WebGL: turquoise vapour seeps in from the edges like paint in dark water, the mouse moves over it like wind over water, and a click sends thin turquoise rings across it like a drop; navigation by arrow keys, phone swipes and two-finger trackpad swipes; a navigation bar with a dot indicator, arrow keys and a small overview cube; a custom video player; and uploads of video and reference images to Cloudinary from the studio.
 
 ## What was left out on purpose
 
@@ -111,7 +111,7 @@ No account or key. The server reads `https://services.swpc.noaa.gov/products/noa
 **Visitors**
 - **Arrow keys**, the arrows in the bar at the bottom, a **two-finger trackpad swipe** or a **phone swipe**: left/right turn the cube between Home and the works (always landing at the top), up/down go through a column. Tall faces scroll first.
 - **Space, Enter** or the small **cube** at the bottom opens the overview map and the tag filter. **Esc** closes it.
-- **Move the mouse** over the page to stir the water; **click** to drop turquoise ink into it.
+- **Move the mouse** over the page like wind over water; **click** to send ripples across it.
 - Visitors who ask their system for reduced motion get the still image.
 
 **Axel**

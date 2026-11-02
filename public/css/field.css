@@ -13,35 +13,18 @@
   white-space: nowrap;
 }
 
-/* A tiny purple circle that trembles like a magnet's field.
-   field.js sets how fast (--vibe-speed) and how far (--vibe-amp) from the Kp index. */
+/* A tiny purple circle that pulses, standing still. field.js sets how fast it
+   pulses from the Kp index: slow when the field is calm, quick in a storm. */
 .kp__orb {
-  position: relative;
   width: 7px;
   height: 7px;
   border: 1px solid rgba(178, 136, 255, 0.95);
   border-radius: 50%;
-  box-shadow: 0 0 6px rgba(150, 100, 255, 0.7);
-  animation: kp-vibe var(--vibe-speed, 0.8s) linear infinite;
+  animation: kp-pulse var(--pulse-speed, 2.4s) ease-in-out infinite;
 }
-/* A faint outer ring, breathing slowly around it */
-.kp__orb::after {
-  content: '';
-  position: absolute;
-  inset: -5px;
-  border: 1px solid rgba(150, 100, 255, 0.35);
-  border-radius: 50%;
-  animation: kp-ring 3s ease-in-out infinite;
-}
-@keyframes kp-vibe {
-  0%, 100% { transform: translate(0, 0); }
-  20% { transform: translate(var(--vibe-amp, 0.5px), calc(var(--vibe-amp, 0.5px) * -0.6)); }
-  45% { transform: translate(calc(var(--vibe-amp, 0.5px) * -0.8), calc(var(--vibe-amp, 0.5px) * 0.4)); }
-  70% { transform: translate(calc(var(--vibe-amp, 0.5px) * 0.5), var(--vibe-amp, 0.5px)); }
-}
-@keyframes kp-ring {
-  0%, 100% { transform: scale(0.85); opacity: 0.3; }
-  50% { transform: scale(1.15); opacity: 0.8; }
+@keyframes kp-pulse {
+  0%, 100% { opacity: 0.45; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.15); }
 }
 
 @media (max-width: 900px) {

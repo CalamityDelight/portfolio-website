@@ -4,9 +4,7 @@
   /* Colours: dark mystic purple, with turquoise that glows like bioluminescence */
   --bg: #07040b;              /* black with a faint purple tint */
   --bg-raised: #150d1f;
-  --face: rgba(12, 7, 20, 0.6); /* the cube's faces while turning */
   --purple: #7a52d8;          /* the magnetic field and quiet details */
-  --purple-dim: #3b2766;
   --text: #ece6f4;            /* off-white is softer on dark than pure white */
   --text-muted: #a297b5;
   --line: rgba(236, 230, 244, 0.1);
@@ -85,16 +83,8 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
 .muted { color: var(--text-muted); }
 
 /* ---------- Bioluminescence ----------
-   The turquoise is a light, not a flat colour: it glows and slowly swells and
-   fades, like plankton lighting up in dark water. Kept faint so text stays calm. */
-@keyframes neon-breathe {
-  0%, 100% { text-shadow: 0 0 4px rgba(94, 240, 196, 0.35), 0 0 12px rgba(94, 240, 196, 0.12); }
-  50%      { text-shadow: 0 0 6px rgba(94, 240, 196, 0.6), 0 0 22px rgba(94, 240, 196, 0.28); }
-}
-@keyframes neon-box {
-  0%, 100% { box-shadow: 0 0 5px rgba(94, 240, 196, 0.22), inset 0 0 5px rgba(94, 240, 196, 0.08); }
-  50%      { box-shadow: 0 0 16px rgba(94, 240, 196, 0.4), inset 0 0 10px rgba(94, 240, 196, 0.16); }
-}
+   The turquoise is a light, not a flat colour: it glows softly. The glows are
+   still (animated shadows repaint every frame and slow the page down). */
 /* A bright spot that drifts along a border, so outlines look like flowing light */
 @keyframes neon-flow {
   from { background-position: 150% 0; }
@@ -104,7 +94,7 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
 .label--accent,
 .neon {
   color: var(--glow);
-  animation: neon-breathe 6s ease-in-out infinite;
+  text-shadow: 0 0 5px rgba(94, 240, 196, 0.45), 0 0 14px rgba(94, 240, 196, 0.15);
 }
 
 /* Thin rectangular outline button with a turquoise sheen */
@@ -125,7 +115,7 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
   letter-spacing: var(--track-label);
   text-decoration: none;
   cursor: pointer;
-  animation: neon-box 6s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(94, 240, 196, 0.25), inset 0 0 6px rgba(94, 240, 196, 0.1);
   transition: background 0.25s, color 0.25s;
 }
 .btn::after {
@@ -142,7 +132,7 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
   animation: neon-flow 8s ease-in-out infinite;
   pointer-events: none;
 }
-.btn--quiet { border-color: rgba(94, 240, 196, 0.45); animation: none; }
+.btn--quiet { border-color: rgba(94, 240, 196, 0.45); box-shadow: none; }
 .btn--quiet::after { display: none; }
 .btn:hover {
   background: rgba(94, 240, 196, 0.1);
