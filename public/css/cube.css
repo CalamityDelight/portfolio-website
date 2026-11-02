@@ -11,8 +11,6 @@
   --navbar-h: 5rem;
   --frame-x: 5vw;               /* the box's distance from the screen edges */
   --frame-y: 5vh;
-  --line-a: rgba(168, 128, 245, 0.42); /* the frame's colours, a soft holographic purple */
-  --line-b: rgba(116, 140, 235, 0.24);
 }
 
 .cube-ready body { overflow: hidden; }
@@ -47,24 +45,50 @@
 .cube-ready .panel.is-active { visibility: visible; }
 .cube-ready .panel:focus { outline: none; }
 
-/* The double frame lines, drawn on top of each face so they turn with it */
-.cube-ready .panel::before,
-.cube-ready .panel::after {
-  content: '';
+/* The double frame, drawn on top of each face so it turns with it.
+   A faint line is always there; brighter neon segments drift around it, so the
+   frame seems to be rebuilt by lines appearing and disappearing. */
+.cube-ready .frame {
   position: absolute;
   z-index: 2;
+  overflow: visible;
   pointer-events: none;
-  border: 1px solid;
-  border-image: linear-gradient(125deg, var(--line-a), var(--line-b) 35%, var(--line-a) 65%, var(--line-b)) 1;
-  transition: filter 1.2s ease;
+  fill: none;
 }
-.cube-ready .panel::before { inset: 0; }
-.cube-ready .panel::after { inset: 8px; opacity: 0.55; }
+.cube-ready .frame--outer { inset: 1px; width: calc(100% - 2px); height: calc(100% - 2px); }
+.cube-ready .frame--inner { inset: 9px; width: calc(100% - 18px); height: calc(100% - 18px); opacity: 0.6; }
 
-/* While turning, the lines drift towards turquoise and brighten slightly */
-.cube-ready.is-turning .panel::before,
-.cube-ready.is-turning .panel::after {
-  filter: hue-rotate(-60deg) brightness(1.35);
+.frame__base { stroke: rgba(160, 110, 255, 0.2); stroke-width: 1; }
+.frame__glow {
+  stroke: rgba(186, 140, 255, 0.9);
+  stroke-width: 1;
+  filter: drop-shadow(0 0 3px rgba(160, 100, 255, 0.9));
+  stroke-dasharray: 260 70 40 120 380 40 90 160;   /* lit segments and gaps, repeated */
+  animation: frame-drift 22s linear infinite, frame-shimmer 7s ease-in-out infinite;
+}
+.frame--inner .frame__glow {
+  stroke-dasharray: 120 200 300 90 60 140;
+  animation-direction: reverse, normal;
+  animation-duration: 30s, 9s;
+}
+@keyframes frame-drift {
+  to { stroke-dashoffset: -1160; }  /* one full pattern length, so the loop is seamless */
+}
+@keyframes frame-shimmer {
+  0%, 100% { stroke-opacity: 0.85; }
+  50% { stroke-opacity: 0.45; }
+}
+
+/* While turning, the lines fade out and back in, drifting towards turquoise */
+.cube-ready.is-turning .frame { animation: frame-turn 0.7s ease-in-out; filter: hue-rotate(-60deg); }
+@keyframes frame-turn {
+  0%, 100% { opacity: 1; }
+  45% { opacity: 0.25; }
+}
+.cube-ready.is-turning .frame--inner { animation-name: frame-turn-inner; }
+@keyframes frame-turn-inner {
+  0%, 100% { opacity: 0.6; }
+  55% { opacity: 0.1; }
 }
 
 /* Inside each face, this layer scrolls. Content clears the header and the
@@ -114,21 +138,22 @@
   display: grid;
   grid-template-columns: repeat(3, 1.6rem);
   grid-template-rows: repeat(2, 1.6rem);
-  gap: 2px;
+  gap: 3px;
 }
 .arrow {
   display: grid;
   place-items: center;
-  border: 0;
+  border: 1px solid rgba(94, 240, 196, 0.35);   /* very thin turquoise outline: clearly a button */
+  border-radius: 2px;
   background: none;
   color: var(--glow);
   font: inherit;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   cursor: pointer;
   text-shadow: 0 0 8px var(--glow-soft);
-  transition: color 0.2s, text-shadow 0.2s, transform 0.2s;
+  transition: color 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
-.arrow:hover { color: var(--mint); text-shadow: 0 0 14px var(--glow); transform: scale(1.15); }
+.arrow:hover { color: var(--mint); border-color: var(--glow); box-shadow: 0 0 10px var(--glow-soft); }
 .arrow[hidden] { display: grid; visibility: hidden; } /* keep the key layout steady */
 .arrow--up { grid-column: 2; grid-row: 1; }
 .arrow--left { grid-column: 1; grid-row: 2; }
@@ -139,6 +164,7 @@
    telling the visitor "you can move like this" */
 .arrows.is-hint .arrow {
   color: var(--text-muted);
+  border-color: var(--line);
   text-shadow: none;
   animation: key-hint 3.2s ease-in-out infinite;
 }
@@ -147,8 +173,8 @@
 .arrows.is-hint .arrow--down { animation-delay: 1.6s; }
 .arrows.is-hint .arrow--left { animation-delay: 2.4s; }
 @keyframes key-hint {
-  0%, 30%, 100% { color: var(--text-muted); text-shadow: none; }
-  10%, 18% { color: var(--glow); text-shadow: 0 0 12px var(--glow); }
+  0%, 30%, 100% { color: var(--text-muted); border-color: var(--line); text-shadow: none; }
+  10%, 18% { color: var(--glow); border-color: rgba(94, 240, 196, 0.6); text-shadow: 0 0 12px var(--glow); }
 }
 
 /* Dot indicator: one small stack per column; the glowing dot is where you are */
@@ -171,8 +197,8 @@
 /* Phones: the cube is the whole screen */
 @media (max-width: 700px) {
   :root { --header-h: 4rem; --navbar-h: 4.5rem; --frame-x: 0px; --frame-y: 0px; }
-  .cube-ready .panel::before { inset: 5px; }
-  .cube-ready .panel::after { inset: 11px; }
+  .cube-ready .frame--outer { inset: 5px; width: calc(100% - 10px); height: calc(100% - 10px); }
+  .cube-ready .frame--inner { inset: 11px; width: calc(100% - 22px); height: calc(100% - 22px); }
   .cube-ready .panel__inner { padding-left: var(--space-3); padding-right: var(--space-3); }
   .cube-ready .site-header { padding: 0 var(--space-3); }
   .navbar { gap: var(--space-3); }

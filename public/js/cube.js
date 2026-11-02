@@ -3,7 +3,7 @@
 // and only one face shows at a time. Moving turns the cube 90° in 3D:
 // left/right switches column (always landing at the top), up/down changes level.
 
-const DURATION = 1400; // ms for one turn of the cube: slow and calm
+const DURATION = 700; // ms for one turn of the cube
 
 export function initCube(cube) {
   const box = cube.querySelector('.cube__box');
@@ -20,6 +20,13 @@ export function initCube(cube) {
 
   // Each face keeps its frame still and scrolls the layer inside it
   const scroller = (panel) => panel.querySelector('.panel__inner');
+
+  // The cube's frame: two thin rectangles on every face, so the lines turn with it.
+  // Each has a faint solid line, and brighter segments that drift around it (cube.css).
+  const frameRect = '<rect class="frame__base" width="100%" height="100%" /><rect class="frame__glow" width="100%" height="100%" />';
+  grid.flat().forEach((panel) => panel.insertAdjacentHTML('afterbegin', `
+    <svg class="frame frame--outer" aria-hidden="true">${frameRect}</svg>
+    <svg class="frame frame--inner" aria-hidden="true">${frameRect}</svg>`));
 
   // ---------- Navigation bar: dots (where you are) and arrows (where you can go) ----------
   const navbar = document.querySelector('.navbar');
@@ -129,8 +136,8 @@ export function initCube(cube) {
     box.style.transition = 'none';
     box.style.transform = `translateZ(${-depth}px)`;
     box.getBoundingClientRect(); // make the browser apply the start position before animating
-    // Soft start, long gentle settle: the cube glides like something moving through water
-    box.style.transition = `transform ${DURATION}ms cubic-bezier(0.5, 0, 0.15, 1)`;
+    // Quick to start, soft to settle, so the turn feels seamless
+    box.style.transition = `transform ${DURATION}ms cubic-bezier(0.3, 0, 0.15, 1)`;
     box.style.transform = `translateZ(${-depth}px) ${turn}`;
 
     root.classList.add('is-turning');
