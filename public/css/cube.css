@@ -31,6 +31,7 @@
   position: absolute;
   inset: 0;
   transform-style: preserve-3d;
+  pointer-events: none;         /* the columns are stacked: only the face in view takes clicks */
 }
 
 .cube-ready .panel {
@@ -42,7 +43,7 @@
   visibility: hidden;
   backface-visibility: hidden;
 }
-.cube-ready .panel.is-active { visibility: visible; }
+.cube-ready .panel.is-active { visibility: visible; pointer-events: auto; }
 .cube-ready .panel:focus { outline: none; }
 
 /* The double frame, drawn on top of each face so it turns with it.
