@@ -7,12 +7,25 @@ Built for the Berghs individual blog project (Programming & Methods, ACE2627).
 
 ## Run it locally
 
-```bash
-npm install
-npm start
-```
+1. Install the packages:
+   ```bash
+   npm install
+   ```
+2. Copy `.env.example` to `.env` and fill in the values (see below).
+3. Create the tables and add the placeholder works:
+   ```bash
+   npm run db:setup
+   ```
+4. Start the server and open http://localhost:3000:
+   ```bash
+   npm start
+   ```
 
-Then open http://localhost:3000.
+### Database (Neon)
+
+1. Create a free project at https://neon.tech.
+2. Put its connection strings in `.env` as `DATABASE_URL` (pooled) and `DATABASE_URL_UNPOOLED` (direct).
+   With the Neon CLI, `npx neon@latest env pull` does this for you.
 
 ## How to move around
 
@@ -20,44 +33,26 @@ Then open http://localhost:3000.
 - **Swipe** on a phone does the same.
 - **Space, Enter** or the **Overview** button opens the zoom-out map of every work.
 
-## Adding a work (for now)
+## Data
 
-Until the studio arrives in Part 2, works live in `public/data/works.json`. Copy one entry and change it:
-
-```json
-{
-  "slug": "my-new-work",
-  "position": 4,
-  "title": "My New Work",
-  "year": 2026,
-  "video_url": "https://link-to-video.mp4",
-  "summary": "Short summary text.",
-  "process": [
-    { "type": "text", "text": "A paragraph about the process." },
-    { "type": "list", "items": ["Step one", "Step two"] }
-  ],
-  "reference_images": [
-    { "url": "https://link-to-image.jpg", "alt": "What the image shows" }
-  ],
-  "tags": ["Tool", "Skill", "Role"]
-}
-```
-
-- `slug`: unique, lowercase, dashes instead of spaces. Used in the URL.
-- `position`: sets the order in the cube (1 sits next to Home).
-- Leave `video_url` or an image `url` empty (`""`) to show a placeholder.
+Posts and comments live in Neon Postgres. The tables are defined in `db/schema.sql`.
+`db/seed-works.json` holds the placeholder works that `npm run db:setup` adds to an empty database.
 
 ## Stack
 
 - Node.js + Express
+- PostgreSQL on Neon, through the `pg` driver
 - Plain HTML, CSS and JavaScript (no framework, no build step)
 
 ## Structure
 
 ```
-server.js            Express server
+server.js            Express server and API routes
+db.js                Shared connection pool to Neon
+db/                  schema.sql and the placeholder works
+scripts/setup-db.js  Creates the tables and seeds the placeholder works
+neon.ts              Neon project config (used by the Neon CLI)
 public/index.html    Page shell and the Home column
 public/css/          base (design system), home, work, cube, menu
 public/js/           app (entry), works, player, cube, menu, fibres
-public/data/         works.json (placeholder works, replaced by the database in Part 2)
 ```

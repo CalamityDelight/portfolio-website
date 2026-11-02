@@ -1,5 +1,4 @@
-// Loads the works and builds one cube column per work.
-// Part 1 reads a local JSON file; Part 2 switches the URL to the server's API.
+// Loads the works from the server and builds one cube column per work.
 
 // Content can contain characters like < and &. Escaping them stops a post
 // or a comment from injecting its own HTML into the page.
@@ -11,11 +10,11 @@ export function esc(value) {
     .replace(/"/g, '&quot;');
 }
 
+// The server reads the posts from Neon, already sorted in Axel's chosen order
 export async function loadWorks() {
-  const res = await fetch('/data/works.json');
-  const works = await res.json();
-  // Axel decides the order by giving each work a position number
-  return works.sort((a, b) => a.position - b.position);
+  const res = await fetch('/api/posts');
+  if (!res.ok) throw new Error('Could not load the works');
+  return res.json();
 }
 
 // Level 1: video with a subtle centred title beneath
