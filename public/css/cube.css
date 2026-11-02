@@ -46,28 +46,23 @@
 .cube-ready .panel:focus { outline: none; }
 
 /* The double frame, drawn on top of each face so it turns with it.
-   A very faint purple line, and a slightly brighter trace drifting slowly
-   around it, so parts of the frame fade in and out. */
+   Unbroken dark purple lines that very slowly fade a little in and out;
+   the inner line is out of step with the outer one. */
 .cube-ready .frame {
   position: absolute;
   z-index: 2;
   overflow: visible;
   pointer-events: none;
   fill: none;
+  animation: frame-breathe 12s ease-in-out infinite;
 }
 .cube-ready .frame--outer { inset: 1px; width: calc(100% - 2px); height: calc(100% - 2px); }
-.cube-ready .frame--inner { inset: 9px; width: calc(100% - 18px); height: calc(100% - 18px); opacity: 0.5; }
-
-.frame__line { stroke: rgba(150, 110, 230, 0.12); stroke-width: 1; }
-.frame__trace {
-  stroke: rgba(170, 125, 255, 0.32);
-  stroke-width: 1;
-  stroke-dasharray: 420 680 260 900;          /* long soft segments and gaps */
-  animation: frame-drift 80s linear infinite;
-}
-.frame--inner .frame__trace { animation-duration: 110s; animation-direction: reverse; }
-@keyframes frame-drift {
-  to { stroke-dashoffset: -2260; }           /* one full pattern length, so the loop is seamless */
+.cube-ready .frame--inner { inset: 9px; width: calc(100% - 18px); height: calc(100% - 18px); animation-delay: -6s; }
+.frame rect { stroke: rgba(92, 62, 160, 0.3); stroke-width: 1; }
+.frame--inner rect { stroke: rgba(92, 62, 160, 0.18); }
+@keyframes frame-breathe {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
 }
 
 /* While turning, the lines fade out and back in, drifting towards turquoise */
@@ -78,7 +73,7 @@
 }
 .cube-ready.is-turning .frame--inner { animation-name: frame-turn-inner; }
 @keyframes frame-turn-inner {
-  0%, 100% { opacity: 0.5; }
+  0%, 100% { opacity: 0.8; }
   55% { opacity: 0.1; }
 }
 
