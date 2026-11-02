@@ -1,0 +1,80 @@
+/* Earth's magnetic field: header readout and the faint site pulse */
+
+.site-header__right { display: flex; align-items: center; gap: var(--space-3); }
+
+.kp {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: var(--size-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.kp__text { display: inline-flex; align-items: center; gap: 0.5rem; }
+
+/* Thin data line: the last 24 hours of Kp */
+.kp__graph polyline {
+  fill: none;
+  stroke: #b9a2ff;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Small dot with a ring that ripples out, like a field line pulsing */
+.kp__dot {
+  position: relative;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #b9a2ff;
+}
+.kp__dot::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 1px solid #b9a2ff;
+  border-radius: 50%;
+  opacity: 0;
+}
+.pulse-on .kp__dot::after { animation: field-ring var(--pulse-speed, 6s) ease-out infinite; }
+@keyframes field-ring {
+  0% { transform: scale(0.4); opacity: 0.8; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.kp__toggle {
+  padding: 0.2em 0.7em;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+.kp__toggle:hover { color: var(--green); border-color: var(--green); }
+
+/* The whole site breathes with the field: the fibre texture dims and swells
+   slightly. --pulse-strength (0.2–1) and --pulse-speed are set from Kp in field.js */
+.pulse-on #fibres { animation: field-pulse var(--pulse-speed, 6s) ease-in-out infinite; }
+@keyframes field-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% {
+    opacity: calc(1 - 0.35 * var(--pulse-strength, 0.2));
+    transform: scale(calc(1 + 0.02 * var(--pulse-strength, 0.2)));
+  }
+}
+
+@media (max-width: 900px) {
+  .kp__name { display: none; }   /* "Kp 3 · calm" is enough on small screens */
+}
+@media (max-width: 700px) {
+  /* Overview on top, the readout tucked underneath */
+  .site-header { align-items: flex-start; }
+  .site-header__right { flex-direction: column-reverse; align-items: flex-end; gap: var(--space-1); }
+  .kp { gap: 0.4rem; }
+  .kp__graph { display: none; }
+  .logo { white-space: nowrap; }
+}

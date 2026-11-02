@@ -216,7 +216,7 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
 @media (max-width: 700px) {
   :root { --size-body: 1.0625rem; }   /* 17px still reads comfortably on phones */
   .site-header { padding: var(--space-2) var(--space-3); }
-  .panel__inner { padding: var(--space-5) var(--space-3) var(--space-4); }
+  .panel__inner { padding: 7.5rem var(--space-3) var(--space-4); } /* clears the two-row header */
 }
 
 /* Respect visitors who ask the system for less motion */

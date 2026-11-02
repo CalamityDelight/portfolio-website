@@ -36,6 +36,7 @@ app.use(auth.router);           // login, logout, "am I signed in?"
 app.use(require('./posts'));    // read, add, edit, delete works
 app.use(require('./uploads'));  // signs uploads to Cloudinary
 app.use(require('./comments')); // read and post comments
+app.use(require('./kp'));       // Earth's magnetic field (NOAA Kp)
 
 // The studio page itself is only sent to a signed-in user; everyone else goes to /login
 app.get('/studio', (req, res) => {

@@ -39,8 +39,8 @@ export function initMenu(nav) {
 
   const menu = document.getElementById('menu');
 
-  // The Overview button lives in the header
-  document.querySelector('.site-header').insertAdjacentHTML('beforeend',
+  // The Overview button lives in the header, top right
+  document.querySelector('.site-header__right').insertAdjacentHTML('beforeend',
     `<button class="btn btn--quiet menu-toggle" type="button" aria-controls="menu" aria-expanded="false">
        <span class="menu-toggle__icon" aria-hidden="true"></span>Overview
      </button>`);
