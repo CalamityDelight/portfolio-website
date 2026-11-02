@@ -121,6 +121,7 @@ No account or key. The server reads `https://services.swpc.noaa.gov/products/noa
 - **Generate summary** writes a draft from the title, process and tags. Edit it, click **Approve draft**, then **Save**.
 - The tag list for the filter and studio is `public/data/tags.json`.
 - The background is `public/img/background.jpg`. Replace the file to change it; the animation uses whatever image is there.
+- The hero portrait is `public/video/portrait.mp4`, a 7-second loop on a black background (H.264, so every browser plays it). Black turns transparent on the page, so only the light shows.
 
 ## Project structure
 
@@ -144,8 +145,10 @@ public/login.html       Sign-in page
 public/css/             base (design system), home, work, cube, menu, field, studio
 public/js/              app (entry), works, player, cube (3D turns, swipes), menu,
                         comments, field (Kp readout), water (WebGL background),
+                        portrait (hero video with transparent black),
                         account, studio
 public/img/             background.jpg, the background image
+public/video/           portrait.mp4, the hero portrait loop
 public/data/tags.json   The fixed tag list
 ```
 

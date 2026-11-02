@@ -6,6 +6,7 @@ import { initMenu } from './menu.js';
 import { initAccount } from './account.js';
 import { initComments } from './comments.js';
 import { initField } from './field.js';
+import { initPortrait } from './portrait.js';
 
 const cube = document.getElementById('cube');
 
@@ -29,5 +30,6 @@ cube.querySelectorAll('.player').forEach(setupPlayer);
 initComments(cube);
 
 const nav = initCube(cube);
+initPortrait();
 initMenu(nav, works, tags);
 initAccount();
