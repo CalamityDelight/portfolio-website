@@ -3,20 +3,51 @@
 A cinematic portfolio of Axel af Ugglas's AI video work and CV, explored like an unfolding cube.
 Built for the Berghs individual blog project (Programming & Methods, ACE2627).
 
-> Work in progress. The full README (what was built, what was left out, service setup) comes in Part 3.
+- **Audience:** employers and creative opportunities.
+- **Idea:** one Home column (intro and CV) and one column per video work. Each work is a blog post.
+- **Stack:** Node.js + Express, plain HTML/CSS/JavaScript (no framework, no build step), PostgreSQL on Neon.
+
+## What was built
+
+| # | Brief task | How the site meets it |
+|---|---|---|
+| 1 | Post listing; open a post and return | Each video work is a post. The **Overview** menu (Space, Enter or the button) lists every post as a cube map; click one to open it, open the menu again or click the logo to go back. |
+| 2 | Add a post | The **studio** (`/studio`, signed in only) adds, edits and deletes posts. Stored in Neon, so they survive a refresh. |
+| 2 PD | Comments stored in a database | Visitors comment at the bottom of each post. First name, last name and email are required; comments are saved in Neon and appear at once. Only the first name is shown. |
+| 3 | Readable text, large and small screens | 18 px body text (17 px on phones), small labels, layouts tested from 375 px phones to 1920 px screens. Swipe navigation on touch screens. |
+| 4 | Search, filter or theme switcher | **Tag filter** in the Overview menu: pick a tool, skill or role to see every process paragraph that mentions it, labelled by work. "Read more" opens the work at that paragraph. |
+| 5 | External API | **NOAA Kp index** (Earth's magnetic field). The header shows e.g. "Earth's field · Kp 2 · calm" with a 24-hour graph, and the background pulses more strongly the more disturbed the field is. Visitors can turn the pulse off. |
+| 6 | Sign in, sign out; sign-in required to add posts | Discreet **login** link at the bottom of the CV. Username and password, bcrypt-hashed, kept in a session cookie. All write routes check the session. |
+| 7 PD | AI API | **Automatic summary** (option d) via OpenRouter. In the studio Axel generates a draft from the title, process and tags, edits it and approves it. Only the approved text is published, under the video. |
+| 8 PD | Posts and comments in Neon | Posts, comments and the login live in Neon Postgres (`db/schema.sql`). |
+
+Other features: arrow-key and swipe navigation with roller transitions, a dot indicator, a custom video player, and uploads of video and reference images to Cloudinary from the studio.
+
+## What was left out on purpose
+
+- **Public sign-up and more than one user.** Only Axel signs in; his account is made with a script.
+- **Login rate limiting.** There is no lock-out after many wrong passwords. A public launch should add it (e.g. `express-rate-limit`).
+- **Persistent sessions.** Sessions are kept in the server's memory, so restarting the server signs Axel out. A live site would store them in Postgres (`connect-pg-simple`).
+- **Comment moderation and spam protection.** Comments can't be deleted from the studio yet, and there is no captcha.
+- **Saved summary drafts.** Only the approved summary is stored; a draft lives in the studio until it is approved.
+- **Very large videos.** Uploads go to Cloudinary in one piece, which the free plan limits to 100 MB per video.
+- **Hosting.** The brief doesn't require the site to be online, so it runs locally.
+- **Build step and framework.** Left out on purpose so every part can be read and explained directly.
 
 ## Run it locally
+
+You need [Node.js](https://nodejs.org) 20 or newer.
 
 1. Install the packages:
    ```bash
    npm install
    ```
-2. Copy `.env.example` to `.env` and fill in the values (see below).
-3. Create the tables and add the placeholder works:
+2. Copy `.env.example` to `.env` and fill in the values (see **Configure the services** below).
+3. Create the tables and add three placeholder works:
    ```bash
    npm run db:setup
    ```
-4. Create the login for the studio (asks for a username and password):
+4. Create the studio login (it asks for a username and a password of at least 10 characters):
    ```bash
    npm run create-user
    ```
@@ -25,68 +56,114 @@ Built for the Berghs individual blog project (Programming & Methods, ACE2627).
    npm start
    ```
 
-### Database (Neon)
+## Configure the services
+
+All secrets live in `.env`, which is listed in `.gitignore` and never committed. `.env.example` shows every variable with a placeholder:
+
+```bash
+DATABASE_URL=postgresql://user:password@host-pooler/dbname?sslmode=require
+DATABASE_URL_UNPOOLED=postgresql://user:password@host/dbname?sslmode=require
+SESSION_SECRET=replace-with-a-long-random-string
+CLOUDINARY_URL=cloudinary://api_key:api_secret@cloud_name
+OPENROUTER_API_KEY=sk-or-replace-me
+OPENROUTER_MODEL=anthropic/claude-sonnet-5.5
+PORT=3000
+```
+
+### Neon (database)
 
 1. Create a free project at https://neon.tech.
-2. Put its connection strings in `.env` as `DATABASE_URL` (pooled) and `DATABASE_URL_UNPOOLED` (direct).
-   With the Neon CLI, `npx neon@latest env pull` does this for you.
-
-### Media uploads (Cloudinary)
-
-1. Create a free account at https://cloudinary.com.
-2. In the Cloudinary console, copy the **API environment variable** (`cloudinary://…`).
-3. Put it in `.env` as `CLOUDINARY_URL`.
+2. Copy the **pooled** connection string (host ends in `-pooler`) into `DATABASE_URL`, and the **direct** one into `DATABASE_URL_UNPOOLED`.
+   With the Neon CLI, `npx neon@latest env pull` writes both for you.
+3. Run `npm run db:setup`. The app uses the pooled address; the setup script uses the direct one, as Neon recommends for schema changes.
 
 ### Session secret
 
-`SESSION_SECRET` signs the login cookie. Use any long random string, for example from:
+`SESSION_SECRET` signs the login cookie so it can't be forged. Any long random string works:
 ```bash
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-## Studio
+### Cloudinary (video and image uploads)
 
-Click the small **login** link at the bottom of the site, sign in, and you land in the studio at `/studio`.
-There you can add, edit and delete works, upload a video and reference images, write process blocks and pick tags.
-Only signed-in users can open the studio or change posts; there is no public sign-up.
+1. Create a free account at https://cloudinary.com.
+2. In the console, copy the **API environment variable** (`cloudinary://…`) into `CLOUDINARY_URL`.
 
-## How to move around
+Files go straight from the browser to Cloudinary. The server only signs each upload, so the API secret never reaches the browser.
 
-- **Arrow keys** or the on-screen arrows: left/right switch between Home and the works, up/down go through a column.
+### OpenRouter (AI summary)
+
+1. Create an account at https://openrouter.ai and add a few dollars of credit (a summary costs well under one cent).
+2. Create an API key and put it in `OPENROUTER_API_KEY`.
+3. Optional: choose another model with `OPENROUTER_MODEL` (any model ID from https://openrouter.ai/models).
+
+### NOAA (Earth's magnetic field)
+
+No account or key. The server reads `https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json` and caches it for 10 minutes, so visitors never call NOAA directly.
+
+## How to use it
+
+**Visitors**
+- **Arrow keys** or the on-screen arrows: left/right switch between Home and the works (always landing at the top), up/down go through a column. Tall panels scroll first.
 - **Swipe** on a phone does the same.
-- **Space, Enter** or the **Overview** button opens the zoom-out map of every work.
+- **Space, Enter** or **Overview** opens the cube map and the tag filter. **Esc** closes it.
 
-## Data
+**Axel**
+- Click **login** at the bottom of the CV, sign in, and you are in the studio.
+- **+ New work**: fill in the title, year and position (the order in the cube), upload a video, write process blocks (text or lists; reorder with the arrows), upload reference images (alt text required) and pick tags.
+- **Generate summary** writes a draft from the title, process and tags. Edit it, click **Approve draft**, then **Save**.
+- The tag list for the filter and studio is `public/data/tags.json`.
 
-Posts, comments and the login live in Neon Postgres. The tables are defined in `db/schema.sql`.
-`db/seed-works.json` holds the placeholder works that `npm run db:setup` adds to an empty database.
-Comments require first name, last name and email; only the first name is ever shown.
-
-## Stack
-
-- Node.js + Express
-- PostgreSQL on Neon, through the `pg` driver
-- bcrypt for password hashing, express-session for the login cookie
-- Cloudinary for video and image uploads
-- Plain HTML, CSS and JavaScript (no framework, no build step)
-
-## Structure
+## Project structure
 
 ```
-server.js            Express server: sessions, routes, the protected /studio page
-auth.js              Login, sign-out and the requireLogin guard
-posts.js             Posts API (read for everyone; add, edit, delete when signed in)
-comments.js          Comments API
-uploads.js           Signs uploads to Cloudinary
-db.js                Shared connection pool to Neon
-db/                  schema.sql and the placeholder works
-scripts/setup-db.js  Creates the tables and seeds the placeholder works
+server.js               Express server: sessions, routes, the protected /studio page
+auth.js                 Login, sign-out and the requireLogin guard
+posts.js                Posts API (read for everyone; add, edit, delete when signed in)
+comments.js             Comments API (only first names are sent to visitors)
+uploads.js              Signs uploads to Cloudinary
+kp.js                   Fetches and caches the NOAA Kp index
+summary.js              Asks OpenRouter for a summary draft
+db.js                   Shared connection pool to Neon
+db/schema.sql           Tables: users, posts, comments
+db/seed-works.json      Placeholder works added by db:setup
+scripts/setup-db.js     Creates the tables and seeds the placeholder works
 scripts/create-user.js  Creates or updates the studio login (bcrypt hash)
-views/studio.html    The studio page (only sent to a signed-in user)
-neon.ts              Neon project config (used by the Neon CLI)
-public/index.html    Page shell and the Home column
-public/login.html    Sign-in page
-public/css/          base (design system), home, work, cube, menu
-public/js/           app (entry), works, player, cube, menu, comments, account, studio, fibres
-public/data/tags.json  The fixed tag list (placeholder until the final list)
+neon.ts                 Neon project config (used by the Neon CLI)
+views/studio.html       The studio page (only sent to a signed-in user)
+public/index.html       Page shell, Home column (intro and CV)
+public/login.html       Sign-in page
+public/css/             base (design system), home, work, cube, menu, field, studio
+public/js/              app (entry), works, player, cube, menu, comments, field,
+                        account, studio, fibres (the background texture)
+public/data/tags.json   The fixed tag list
 ```
+
+## API
+
+| Method | Route | Who | What |
+|---|---|---|---|
+| GET | `/api/posts` | everyone | All works in cube order |
+| POST | `/api/posts` | signed in | Add a work |
+| PUT | `/api/posts/:id` | signed in | Edit a work |
+| DELETE | `/api/posts/:id` | signed in | Delete a work and its comments |
+| GET | `/api/posts/:id/comments` | everyone | Comments (first name, text, date) |
+| POST | `/api/posts/:id/comments` | everyone | Add a comment |
+| POST | `/api/login` · `/api/logout` | everyone | Sign in · sign out |
+| GET | `/api/me` | everyone | Am I signed in? |
+| GET | `/api/kp` | everyone | Current Kp index (cached) |
+| POST | `/api/summary` | signed in | AI summary draft |
+| GET | `/api/upload-signature` | signed in | Signature for a Cloudinary upload |
+
+## Security notes
+
+- Passwords are stored only as bcrypt hashes (cost 12).
+- The session cookie is `httpOnly` and `sameSite=lax`, and the session id is renewed at login.
+- Every SQL query uses placeholders (`$1`, `$2`), which prevents SQL injection.
+- Everything shown on the page is HTML-escaped, so a post or comment can't inject scripts.
+- The server validates every field again, whatever the browser sent.
+- API keys are read from `.env` on the server and never sent to the browser.
+
+## Presentation
+
+The slides are added to this repo as `presentation/` before hand-in.
