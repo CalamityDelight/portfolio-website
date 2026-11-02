@@ -94,7 +94,9 @@ export function initCube(cube) {
     const { col, level } = state;
     updateArrows();
     updatePlace(col);
-    // The hero is the very first face: no place label, magnetic field shown (base.css, field.css)
+    // The first face of a column shows no place label (base.css); the very first
+    // face, the hero, also shows the magnetic field instead of the overview cube (field.css)
+    root.classList.toggle('at-top', level === 0);
     root.classList.toggle('at-start', col === 0 && level === 0);
 
 

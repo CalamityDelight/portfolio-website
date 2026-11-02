@@ -235,7 +235,7 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
   transition: opacity 0.25s;
 }
 .site-header__place.is-changing,
-.at-start .site-header__place { opacity: 0; }   /* the hero needs no label */
+.at-top .site-header__place { opacity: 0; }   /* shown only below a column's first face */
 
 /* Discreet footer at the bottom of the CV */
 .site-footer {

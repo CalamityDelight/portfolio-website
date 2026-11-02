@@ -110,7 +110,7 @@ No account or key. The server reads `https://services.swpc.noaa.gov/products/noa
 
 **Visitors**
 - **Arrow keys**, the arrows in the bar at the bottom, a **two-finger trackpad swipe** or a **phone swipe**: left/right turn the cube between Home and the works (always landing at the top), up/down go through a column. Tall faces scroll first.
-- Past the hero, the middle of the header says where you are: **Introduction**, or the title of the project you are in.
+- Below the first face of each column, the middle of the header says where you are: **Introduction**, or the title of the project you are in.
 - **Space, Enter** or the small **cube** top right (shown everywhere except the hero, where the magnetic field readout sits) opens the overview map and the tag filter. **Esc** closes it.
 - **Move the mouse** over the page like wind over water; **click** to send ripples across it.
 - Visitors who ask their system for reduced motion get the still image.
