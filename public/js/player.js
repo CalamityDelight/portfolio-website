@@ -21,7 +21,11 @@ export function setupPlayer(player) {
       <input class="player__seek" type="range" min="0" max="1000" value="0" aria-label="Seek">
       <span class="player__time">0:00</span>
       <button class="player__mute" type="button" aria-label="Mute">Sound</button>
-      <button class="player__full" type="button" aria-label="Full screen">Full</button>
+      <button class="player__full" type="button" aria-label="Full screen">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+          <path d="M1 5V1h4M11 1h4v4M15 11v4h-4M5 15H1v-4" />
+        </svg>
+      </button>
     </div>`);
 
   const big = player.querySelector('.player__big');

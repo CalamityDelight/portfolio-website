@@ -2,8 +2,6 @@
 
 /* ---------- Video ---------- */
 .work-video {
-  min-height: 100vh;
-  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -12,8 +10,8 @@
 
 .player {
   position: relative;
-  /* As wide as possible while video + title still fit on one screen */
-  width: min(100%, calc((100vh - 20rem) * 16 / 9));
+  /* As wide as possible while video + title still fit in the cube's face (cqh = % of face height) */
+  width: min(100%, calc((100cqh - 14rem) * 16 / 9));
   margin: 0 auto;
   aspect-ratio: 16 / 9;
   background: #000;
@@ -63,6 +61,7 @@
 .player:focus-within .player__bar,
 .player:not(.is-playing) .player__bar { opacity: 1; }
 
+.player__full svg { width: 15px; height: 15px; display: block; }
 .player__bar button {
   background: none;
   border: 0;
