@@ -64,7 +64,9 @@ All secrets live in `.env`, which is listed in `.gitignore` and never committed.
 DATABASE_URL=postgresql://user:password@host-pooler/dbname?sslmode=require
 DATABASE_URL_UNPOOLED=postgresql://user:password@host/dbname?sslmode=require
 SESSION_SECRET=replace-with-a-long-random-string
-CLOUDINARY_URL=cloudinary://api_key:api_secret@cloud_name
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=123456789012345
+CLOUDINARY_API_SECRET=replace-with-your-api-secret
 OPENROUTER_API_KEY=sk-or-replace-me
 OPENROUTER_MODEL=anthropic/claude-sonnet-5.5
 PORT=3000
@@ -87,7 +89,8 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ### Cloudinary (video and image uploads)
 
 1. Create a free account at https://cloudinary.com.
-2. In the console, copy the **API environment variable** (`cloudinary://…`) into `CLOUDINARY_URL`.
+2. In the console, open **Settings → API Keys** and copy the cloud name, API key and API secret
+   into `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` and `CLOUDINARY_API_SECRET`.
 
 Files go straight from the browser to Cloudinary. The server only signs each upload, so the API secret never reaches the browser.
 

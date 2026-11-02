@@ -5,16 +5,20 @@
 //   browser --(1) may I upload?--> server --(2) signature--> browser
 //   browser --(3) file + signature--> Cloudinary --(4) file URL--> browser
 const express = require('express');
-const cloudinary = require('cloudinary').v2; // reads CLOUDINARY_URL from the environment
+const cloudinary = require('cloudinary').v2;
 const { requireLogin } = require('./auth');
 
 const router = express.Router();
 const FOLDER = 'portfolio';
 
+// The three Cloudinary values come from .env
+const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+const apiKey = process.env.CLOUDINARY_API_KEY;
+const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
 router.get('/api/upload-signature', requireLogin, (req, res) => {
-  const { cloud_name: cloudName, api_key: apiKey, api_secret: apiSecret } = cloudinary.config();
-  if (!cloudName || !apiKey || !apiSecret || cloudName === 'cloud_name') {
-    return res.status(503).json({ error: 'Cloudinary is not set up yet. Add CLOUDINARY_URL to .env.' });
+  if (!cloudName || !apiKey || !apiSecret) {
+    return res.status(503).json({ error: 'Cloudinary is not set up yet. Fill in the three CLOUDINARY_ lines in .env.' });
   }
 
   // The signature covers these exact values, so the browser can't change the folder.
