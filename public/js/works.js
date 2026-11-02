@@ -66,7 +66,6 @@ function summaryPanel(work) {
         <section class="summary">
           <header class="summary__head">
             <span class="label label--accent">AI summary</span>
-            <span class="summary__graph" aria-hidden="true"></span>
           </header>
           ${paragraphs.length
             ? paragraphs.map((p) => `<p class="summary__text">${esc(p)}</p>`).join('')

@@ -118,31 +118,13 @@
 
 /* ---------- AI summary ---------- */
 .summary {
-  max-width: 40rem;
-  margin-left: auto;                 /* pushed right: asymmetric placement, floating free */
-  padding-left: var(--space-4);
-  border-left: 1px solid rgba(94, 240, 196, 0.4);
+  width: 100%;
 }
-.summary__head {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin-bottom: var(--space-3);
-}
-/* Small graph-like line, the same "data look" the Kp readout will use */
-.summary__graph {
-  flex: 1;
-  height: 14px;
-  background:
-    linear-gradient(var(--glow), var(--glow)) 0 50% / 100% 1px no-repeat,
-    repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 12px);
-  opacity: 0.5;
-}
-.summary__text { font-size: var(--size-lead); font-weight: 300; margin-bottom: var(--space-3); }
+.summary__head { margin-bottom: var(--space-3); }
+.summary__text { max-width: 44rem; font-size: 0.9375rem; font-weight: 300; margin-bottom: var(--space-2); }
 .summary__text:last-of-type { margin-bottom: var(--space-4); }
-.summary h3 { margin: var(--space-3) 0 var(--space-2); }
-.summary__note { margin: var(--space-4) 0 0; font-size: 0.8rem; color: var(--text-muted); }
-
+.summary h3 { margin: var(--space-3) 0 var(--space-1); }
+.summary__note { margin: var(--space-4) 0 0; font-size: 0.6875rem; color: var(--text-muted); opacity: 0.45; }
 
 /* ---------- Process ---------- */
 .process > * { max-width: var(--measure); margin-left: 12%; }
@@ -240,7 +222,6 @@
 
 /* ---------- Phones ---------- */
 @media (max-width: 700px) {
-  .summary { padding-left: var(--space-3); }
   .process > *, .process__list { margin-left: 0; }
   .comment-form { grid-template-columns: 1fr; }
   .player__full { display: none; }   /* phones open full screen from the video itself */
