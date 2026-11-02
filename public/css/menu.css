@@ -7,8 +7,9 @@
   filter: blur(2px);
 }
 .menu-open .arrows,
-.menu-open .dots { opacity: 0; pointer-events: none; }
-.arrows, .dots { transition: opacity 0.4s; }
+.menu-open .dots,
+.menu-open .site-footer { opacity: 0; pointer-events: none; }
+.arrows, .dots, .site-footer { transition: opacity 0.4s; }
 
 .menu {
   position: fixed;

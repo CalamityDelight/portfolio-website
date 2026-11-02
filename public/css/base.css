@@ -167,6 +167,32 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
 }
 .logo span { display: block; font-weight: 400; color: var(--text-muted); }
 
+/* Tiny footer link, bottom centre, between the dots and the arrows */
+.site-footer {
+  position: fixed;
+  left: 50%;
+  bottom: var(--space-3);
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  gap: var(--space-2);
+}
+.footer-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--size-label);
+  letter-spacing: var(--track-label);
+  text-transform: lowercase;
+  color: var(--text-muted);
+  opacity: 0.6;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s, color 0.2s;
+}
+.footer-link:hover { opacity: 1; color: var(--green); }
+
 /* Content sits above the fibre canvas */
 .cube { position: relative; z-index: 1; }
 

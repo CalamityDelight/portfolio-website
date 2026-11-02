@@ -1,14 +1,38 @@
 // Express server: serves the front end in /public and a small JSON API.
 require('dotenv').config({ quiet: true }); // reads secrets from .env into process.env
 const express = require('express');
+const session = require('express-session');
 const path = require('path');
 const db = require('./db');
+const auth = require('./auth');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+if (!process.env.SESSION_SECRET) {
+  throw new Error('SESSION_SECRET is missing. Add it to .env (see .env.example).');
+}
+
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+
+// Sessions: after login the browser gets a cookie holding only a random,
+// signed session id. The server remembers which id belongs to a signed-in user.
+app.use(session({
+  secret: process.env.SESSION_SECRET,   // signs the cookie so it can't be forged
+  resave: false,
+  saveUninitialized: false,             // no cookie at all for visitors who don't sign in
+  cookie: {
+    httpOnly: true,                     // page scripts can't read the cookie
+    sameSite: 'lax',                    // not sent with requests from other sites
+    secure: process.env.NODE_ENV === 'production', // HTTPS only once the site is live
+    maxAge: 1000 * 60 * 60 * 8,         // signed out automatically after 8 hours
+  },
+}));
+
+// extensions: ['html'] lets /login serve login.html
+app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] }));
+
+app.use(auth.router);
 
 // ---------- Posts ----------
 
