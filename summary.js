@@ -1,14 +1,14 @@
-// AI summary: the studio sends a work's title, process and tags; we ask a
-// language model on OpenRouter for a short summary and send the draft back.
-// Axel edits and approves it in the studio; only approved text is published.
+// AI summary: the studio sends a work's title, process and tags; we ask Claude
+// (Anthropic's API, through the official SDK) for a short summary and send the
+// draft back. Axel edits and approves it in the studio; only approved text is published.
 const express = require('express');
+const Anthropic = require('@anthropic-ai/sdk').default;
 const { requireLogin } = require('./auth');
 
 const router = express.Router();
-const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const MODEL = process.env.OPENROUTER_MODEL || 'anthropic/claude-sonnet-5.5';
+const MODEL = process.env.ANTHROPIC_MODEL || 'claude-opus-5-5';
 
-// The instructions the model follows every time (the "system prompt")
+// The instructions Claude follows every time (the "system prompt")
 const SYSTEM_PROMPT = `You write the summary shown at the top of a portfolio post by Axel af Ugglas, an AI video artist.
 
 Write:
@@ -21,7 +21,7 @@ Write:
 
 Plain text only: no headings, no markdown, no bullet points.`;
 
-// Turns the process blocks into plain text the model can read
+// Turns the process blocks into plain text Claude can read
 function processAsText(process) {
   return (Array.isArray(process) ? process : []).map((block) => block.type === 'list'
     ? (block.items || []).map((item) => `- ${item}`).join('\n')
@@ -30,9 +30,8 @@ function processAsText(process) {
 }
 
 router.post('/api/summary', requireLogin, async (req, res) => {
-  const key = process.env.OPENROUTER_API_KEY;
-  if (!key || key.startsWith('sk-or-replace')) {
-    return res.status(503).json({ error: 'OpenRouter is not set up yet. Add OPENROUTER_API_KEY to .env.' });
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return res.status(503).json({ error: 'The AI summary is not set up yet. Add ANTHROPIC_API_KEY to .env.' });
   }
 
   const { title, process: blocks, tags } = req.body;
@@ -47,37 +46,46 @@ Tags (tools, skills, roles): ${(tags || []).join(', ') || 'none'}
 Process:
 ${processText}`;
 
+  // The client reads ANTHROPIC_API_KEY from the environment; the key never reaches the browser
+  const client = new Anthropic();
+
   try {
-    const response = await fetch(OPENROUTER_URL, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${key}`,  // the secret key stays on the server
-        'Content-Type': 'application/json',
-        'X-Title': 'Axel af Ugglas portfolio', // shows up in OpenRouter's usage list
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          { role: 'user', content: material },
-        ],
-        max_tokens: 600,
-        temperature: 0.5, // a little variety, but stays close to the facts
-      }),
-      signal: AbortSignal.timeout(60000),
+    const response = await client.beta.messages.create({
+      model: MODEL,
+      max_tokens: 16000,
+      output_config: { effort: 'medium' }, // how hard Claude thinks; medium suits a short summary
+      // If the model declines for safety reasons, the API retries on a suitable fallback model
+      betas: ['server-side-fallback-2026-07-01'],
+      fallbacks: 'default',
+      system: SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: material }],
     });
 
-    const data = await response.json();
-    if (!response.ok) {
-      console.error('OpenRouter error:', data);
-      return res.status(502).json({ error: `The AI service said: ${data.error?.message || response.status}` });
+    if (response.stop_reason === 'refusal') {
+      return res.status(502).json({ error: 'The AI declined to write this summary. Try rewording the process text.' });
     }
 
-    const draft = data.choices?.[0]?.message?.content?.trim();
-    if (!draft) return res.status(502).json({ error: 'The AI service sent back an empty answer. Try again.' });
-    res.json({ draft, model: MODEL });
+    // The answer is a list of content blocks; keep the text ones
+    const draft = response.content
+      .filter((block) => block.type === 'text')
+      .map((block) => block.text)
+      .join('')
+      .trim();
+    if (!draft) return res.status(502).json({ error: 'The AI sent back an empty answer. Try again.' });
+
+    res.json({ draft, model: response.model });
   } catch (err) {
+    // Most specific first, so each problem gets a clear message
     console.error('Summary failed:', err.message);
+    if (err instanceof Anthropic.AuthenticationError) {
+      return res.status(502).json({ error: 'The Anthropic API key in .env is not valid.' });
+    }
+    if (err instanceof Anthropic.RateLimitError) {
+      return res.status(502).json({ error: 'Too many requests to the AI right now. Wait a minute and try again.' });
+    }
+    if (err instanceof Anthropic.APIError && err.status) {
+      return res.status(502).json({ error: `The AI service said: ${err.message}` });
+    }
     res.status(502).json({ error: 'Could not reach the AI service. Try again.' });
   }
 });

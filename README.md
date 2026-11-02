@@ -18,7 +18,7 @@ Built for the Berghs individual blog project (Programming & Methods, ACE2627).
 | 4 | Search, filter or theme switcher | **Tag filter** in the Overview menu: pick a tool, skill or role to see every process paragraph that mentions it, labelled by work. "Read more" opens the work at that paragraph. |
 | 5 | External API | **NOAA Kp index** (Earth's magnetic field). The header shows e.g. "Earth's field · Kp 2 · calm" with a 24-hour graph, and the background pulses more strongly the more disturbed the field is. Visitors can turn the pulse off. |
 | 6 | Sign in, sign out; sign-in required to add posts | Discreet **login** link at the bottom of the CV. Username and password, bcrypt-hashed, kept in a session cookie. All write routes check the session. |
-| 7 PD | AI API | **Automatic summary** (option d) via OpenRouter. In the studio Axel generates a draft from the title, process and tags, edits it and approves it. Only the approved text is published, under the video. |
+| 7 PD | AI API | **Automatic summary** (option d) with Claude through the Anthropic API. In the studio Axel generates a draft from the title, process and tags, edits it and approves it. Only the approved text is published, under the video. |
 | 8 PD | Posts and comments in Neon | Posts, comments and the login live in Neon Postgres (`db/schema.sql`). |
 
 Other features: arrow-key and swipe navigation with roller transitions, a dot indicator, a custom video player, and uploads of video and reference images to Cloudinary from the studio.
@@ -67,8 +67,8 @@ SESSION_SECRET=replace-with-a-long-random-string
 CLOUDINARY_CLOUD_NAME=your-cloud-name
 CLOUDINARY_API_KEY=123456789012345
 CLOUDINARY_API_SECRET=replace-with-your-api-secret
-OPENROUTER_API_KEY=sk-or-replace-me
-OPENROUTER_MODEL=anthropic/claude-sonnet-5.5
+ANTHROPIC_API_KEY=sk-ant-replace-me
+ANTHROPIC_MODEL=claude-opus-5-5
 PORT=3000
 ```
 
@@ -94,11 +94,13 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 Files go straight from the browser to Cloudinary. The server only signs each upload, so the API secret never reaches the browser.
 
-### OpenRouter (AI summary)
+### Anthropic (AI summary)
 
-1. Create an account at https://openrouter.ai and add a few dollars of credit (a summary costs well under one cent).
-2. Create an API key and put it in `OPENROUTER_API_KEY`.
-3. Optional: choose another model with `OPENROUTER_MODEL` (any model ID from https://openrouter.ai/models).
+1. Create an account at https://console.anthropic.com and add credit (a summary costs about one cent).
+2. Under **API Keys**, create a key and put it in `ANTHROPIC_API_KEY`.
+3. Optional: choose another Claude model with `ANTHROPIC_MODEL` (default `claude-opus-5-5`).
+
+The server calls the Messages API through the official `@anthropic-ai/sdk` package, so the key never reaches the browser.
 
 ### NOAA (Earth's magnetic field)
 
@@ -126,7 +128,7 @@ posts.js                Posts API (read for everyone; add, edit, delete when sig
 comments.js             Comments API (only first names are sent to visitors)
 uploads.js              Signs uploads to Cloudinary
 kp.js                   Fetches and caches the NOAA Kp index
-summary.js              Asks OpenRouter for a summary draft
+summary.js              Asks Claude (Anthropic API) for a summary draft
 db.js                   Shared connection pool to Neon
 db/schema.sql           Tables: users, posts, comments
 db/seed-works.json      Placeholder works added by db:setup
