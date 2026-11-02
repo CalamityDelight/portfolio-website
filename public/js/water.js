@@ -6,14 +6,13 @@
 //     image, seep in from the edges and slowly draw back, like paint in dark water.
 //     The image's own turquoise drifts along with them. Earth's Kp index (from
 //     field.js) makes the flow a little faster in a disturbed field.
-//  2. Wind on water: under the pointer the surface ripples faintly and turquoise
-//     light shows through, in a small area.
-//  3. A click is a drop of paint: a ripple spreads and a tiny bloom of turquoise
-//     seeps out from that spot, then dissolves.
+//  2. Wind on water: under the pointer the surface ripples faintly.
+//  3. A click is a drop hitting the water: thin turquoise rings spread out and fade.
 //
 // WebGL runs a small program (a "shader") on the graphics card for every pixel,
-// which is what makes animating a full-screen image smooth. If WebGL isn't
-// available, the still image simply stays.
+// which is what makes animating a full-screen image smooth. To stay light, the
+// vapour is only computed near the edges, where it lives, and the picture is
+// redrawn 30 times a second. If WebGL isn't available, the still image stays.
 
 (function () {
   const canvas = document.getElementById('water');
@@ -74,65 +73,59 @@
       vec2 px = vUv * uRes;
       vec2 uv = cover(vUv);
       float t = uTime;
-      vec3 sea = vec3(0.12, 0.62, 0.48);      // the turquoise we paint with
-      vec3 deep = vec3(0.13, 0.07, 0.26);     // the purple swirls
+      vec3 sea = vec3(0.12, 0.62, 0.48);      // turquoise
+      vec3 deep = vec3(0.13, 0.07, 0.26);     // purple swirls
 
-      // Pointer: a small area of water it is touching
-      vec2 toPointer = px - uPointer.xy;
-      float near = exp(-dot(toPointer, toPointer) / (110.0 * 110.0)) * uPointer.z;
-
-      // Drops: a ripple ring travels outwards, and a tiny bloom of paint seeps out
+      // 2. Wind on water: the surface shifts a little around the pointer
       vec2 shift = vec2(0.0);
-      float ink = 0.0;
+      vec2 toPointer = px - uPointer.xy;
+      float near = exp(-dot(toPointer, toPointer) / (160.0 * 160.0)) * uPointer.z;
+      if (near > 0.002) {
+        shift = (vec2(noise(px * 0.02 + t * 0.8), noise(px * 0.02 + 7.3 - t * 0.7)) - 0.5) * near * 0.008;
+      }
+
+      // 3. Drops: three thin rings spread out from each click and fade,
+      // and the water around them is pushed a little, like a real ripple
+      float rings = 0.0;
       for (int i = 0; i < 4; i++) {
         float age = t - uDrops[i].z;
-        if (age < 0.0 || age > 4.0) continue;
+        if (age < 0.0 || age > 3.0) continue;
         vec2 v = px - uDrops[i].xy;
         float r = length(v);
-        float front = age * 220.0;
-        float ring = exp(-pow((r - front) / 35.0, 2.0)) * exp(-age * 1.6);
-        shift += (v / (r + 0.001)) * sin((r - front) * 0.08) * ring * 0.004;
-        // the bloom grows to ~70px with a ragged, inky edge, then fades
-        float edge = 8.0 + 55.0 * (1.0 - exp(-age * 1.4)) + (fbm(v * 0.03 + age * 0.4) - 0.5) * 50.0;
-        // (1 - smoothstep) = "inside the edge" and "not yet faded"; smoothstep needs its edges in order
-        ink += (1.0 - smoothstep(edge - 30.0, edge, r)) * (1.0 - smoothstep(1.2, 4.0, age)) * smoothstep(0.0, 0.25, age);
-      }
-      if (near > 0.001) {
-        shift += (vec2(fbm(px * 0.012 + t * 0.7), fbm(px * 0.012 + 7.3 - t * 0.6)) - 0.5) * near * 0.01;
+        float fade = pow(1.0 - age / 3.0, 2.0);
+        for (int k = 0; k < 3; k++) {
+          float front = age * 140.0 - float(k) * 26.0;  // each ring a little behind the last
+          if (front > 0.0) rings += exp(-pow((r - front) / 1.1, 2.0)) * fade * (1.0 - float(k) * 0.3);
+        }
+        float wave = r - age * 140.0;
+        shift += (v / (r + 0.001)) * sin(wave * 0.09) * exp(-wave * wave / 1600.0) * fade * 0.003;
       }
 
-      // 1. The image, with its own turquoise drifting along a slow current
-      float speed = 0.03 + 0.04 * uKp;
-      vec2 p = uv * 2.6;
-      vec2 q = vec2(fbm(p + vec2(0.0, t * speed)), fbm(p + vec2(5.2, -t * speed)));
-      vec3 still = texture2D(uImage, uv + shift).rgb;
-      vec3 moving = texture2D(uImage, uv + shift + (q - 0.5) * 0.06).rgb;
-      vec3 color = mix(still, moving, max(turquoise(still), turquoise(moving)));
+      vec3 color = texture2D(uImage, uv + shift).rgb;
 
-      // Vapour: noise folded into itself ("domain warping") gives curling tendrils.
-      // 1 - |2v - 1| turns soft clouds into thin filaments, like paint threads in water.
-      vec2 r2 = vec2(fbm(p * 1.4 + 4.0 * q + vec2(1.7, 9.2) + t * speed * 1.5),
-                     fbm(p * 1.4 + 4.0 * q + vec2(8.3, 2.8) - t * speed * 1.2));
-      float v = fbm(p * 1.4 + 3.5 * r2);
-      float filament = pow(1.0 - abs(2.0 * v - 1.0), 14.0) * smoothstep(0.35, 0.65, fbm(p * 0.9 - t * speed));
-
-      // The vapour lives near the edges, and its reach breathes in and out slowly
+      // 1. Turquoise flow and vapour. Both live near the edges, so the middle of
+      // the screen skips this work (the biggest saving in the whole shader).
       vec2 e = min(vUv, 1.0 - vUv);
       float edgeDist = min(e.x * uRes.x / uRes.y, e.y);
-      float reach = 0.1 + 0.06 * sin(t * 0.12 + v * 6.0) + 0.04 * uKp;
-      float edgeMask = 1.0 - smoothstep(0.0, reach, edgeDist);
-      color += sea * filament * edgeMask * 0.45;
-      color += deep * pow(v, 3.0) * edgeMask * 0.35;
+      if (edgeDist < 0.3) {
+        float speed = 0.03 + 0.04 * uKp;
+        vec2 p = uv * 2.6;
+        vec2 q = vec2(fbm(p + vec2(0.0, t * speed)), fbm(p + vec2(5.2, -t * speed)));
+        // The image's own turquoise drifts along a slow current (fading out towards the middle)
+        float flowAmount = 1.0 - smoothstep(0.22, 0.3, edgeDist);
+        vec3 moving = texture2D(uImage, uv + shift + (q - 0.5) * 0.06 * flowAmount).rgb;
+        color = mix(color, moving, max(turquoise(color), turquoise(moving)));
 
-      // 2. Turquoise stirred up just under the pointer: thin veins of light, not a flat glow
-      if (near > 0.001) {
-        float lv = fbm(px * 0.011 + vec2(t * 0.5, -t * 0.35));
-        float veins = pow(1.0 - abs(2.0 * lv - 1.0), 5.0);
-        color += sea * near * (0.05 + 0.75 * veins);
+        // Vapour: noise folded into itself ("domain warping") gives curling tendrils;
+        // 1 - |2v - 1| turns soft clouds into thin filaments, like paint threads in water
+        float v = fbm(p * 1.4 + 4.0 * q + t * speed * 1.5);
+        float filament = pow(1.0 - abs(2.0 * v - 1.0), 14.0) * smoothstep(0.35, 0.65, q.x);
+        float reach = 0.1 + 0.06 * sin(t * 0.12 + v * 6.0) + 0.04 * uKp; // breathes in and out
+        float edgeMask = 1.0 - smoothstep(0.0, reach, edgeDist);
+        color += (sea * filament * 0.45 + deep * v * v * v * 0.35) * edgeMask;
       }
 
-      // 3. The paint from a drop, threaded like the vapour
-      color += sea * clamp(ink, 0.0, 1.0) * (0.5 + 0.9 * smoothstep(0.3, 0.8, fbm(px * 0.035 + t * 0.3)));
+      color += sea * clamp(rings, 0.0, 1.0) * 0.55;
 
       gl_FragColor = vec4(color, 1.0);
     }`;
@@ -210,8 +203,13 @@
   window.addEventListener('resize', resize);
   resize();
 
-  function loop() {
+  // About 30 frames a second: smooth for slow water, half the work of 60
+  let lastFrame = 0;
+  function loop(now) {
     if (!enabled || !ready) return;
+    requestAnimationFrame(loop);
+    if (now - lastFrame < 32) return;
+    lastFrame = now;
     gl.uniform2f(uniforms.res, window.innerWidth, window.innerHeight);
     gl.uniform1f(uniforms.time, seconds());
     gl.uniform1f(uniforms.kp, intensity);
@@ -220,8 +218,7 @@
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     canvas.classList.add('is-live'); // fade the canvas in over the still image
 
-    pointer.energy *= 0.95; // the surface calms down when the pointer rests
-    requestAnimationFrame(loop);
+    pointer.energy *= 0.92; // the surface calms down when the pointer rests
   }
 
   // ---------- The visitor touching the water ----------
@@ -229,7 +226,7 @@
     const moved = Math.hypot(e.clientX - pointer.x, e.clientY - pointer.y);
     pointer.x = e.clientX;
     pointer.y = e.clientY;
-    if (moved < 300) pointer.energy = Math.min(1, pointer.energy + moved / 90);
+    if (moved < 300) pointer.energy = Math.min(1, pointer.energy + moved / 120);
   }, { passive: true });
 
   window.addEventListener('pointerdown', (e) => {
