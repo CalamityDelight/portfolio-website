@@ -84,20 +84,26 @@
         shift = (vec2(noise(px * 0.02 + t * 0.8), noise(px * 0.02 + 7.3 - t * 0.7)) - 0.5) * near * 0.008;
       }
 
-      // 3. Drops: three thin rings spread out from each click and fade,
-      // and the water around them is pushed a little, like a real ripple
+      // 3. Drops: three soft rings spread out from each click and fade. Each ring
+      // is a faint bright crest with a darker trough just inside it, slightly
+      // uneven, like real ripples on water; the water around them is pushed a little.
       float rings = 0.0;
       for (int i = 0; i < 4; i++) {
         float age = t - uDrops[i].z;
         if (age < 0.0 || age > 3.0) continue;
         vec2 v = px - uDrops[i].xy;
         float r = length(v);
-        float fade = pow(1.0 - age / 3.0, 2.0);
+        float fade = pow(1.0 - age / 3.0, 2.0) * smoothstep(0.0, 0.15, age);
+        float wobble = (noise(v * 0.05 + age) - 0.5) * 4.0;   // ripples are never perfect circles
         for (int k = 0; k < 3; k++) {
-          float front = age * 140.0 - float(k) * 26.0;  // each ring a little behind the last
-          if (front > 0.0) rings += exp(-pow((r - front) / 1.1, 2.0)) * fade * (1.0 - float(k) * 0.3);
+          float front = age * 120.0 - float(k) * 24.0 + wobble;  // each ring a little behind the last
+          if (front > 0.0) {
+            float d = r - front;
+            float strength = fade * (1.0 - float(k) * 0.3) / (1.0 + front * 0.01); // weaker as it spreads
+            rings += (exp(-d * d / 6.0) - 0.45 * exp(-(d + 5.0) * (d + 5.0) / 10.0)) * strength;
+          }
         }
-        float wave = r - age * 140.0;
+        float wave = r - age * 120.0;
         shift += (v / (r + 0.001)) * sin(wave * 0.09) * exp(-wave * wave / 1600.0) * fade * 0.003;
       }
 
@@ -125,7 +131,7 @@
         color += (sea * filament * 0.45 + deep * v * v * v * 0.35) * edgeMask;
       }
 
-      color += sea * clamp(rings, 0.0, 1.0) * 0.55;
+      color += sea * clamp(rings, -0.5, 1.0) * 0.32;   // negative = the darker trough
 
       gl_FragColor = vec4(color, 1.0);
     }`;
