@@ -104,7 +104,7 @@
   padding: 0 var(--space-4);
 }
 
-/* ---------- Navigation bar: dots, arrows, overview cube ---------- */
+/* ---------- Navigation bar: the arrow keys, centred ---------- */
 .navbar {
   position: fixed;
   left: 0;
@@ -163,22 +163,6 @@
   10%, 18% { color: var(--glow); border-color: rgba(94, 240, 196, 0.6); text-shadow: 0 0 12px var(--glow); }
 }
 
-/* Dot indicator: one small stack per column; the glowing dot is where you are */
-.dots {
-  display: flex;
-  align-items: flex-start;
-  gap: 7px;
-}
-.dots__col { display: flex; flex-direction: column; gap: 4px; opacity: 0.4; transition: opacity 0.3s; }
-.dots__col.is-current { opacity: 1; }
-.dots i {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--text-muted);
-  transition: background 0.3s, box-shadow 0.3s;
-}
-.dots i.is-active { background: var(--glow); box-shadow: 0 0 8px var(--glow); }
 
 /* Phones: the cube is the whole screen */
 @media (max-width: 700px) {

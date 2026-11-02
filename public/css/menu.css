@@ -163,7 +163,7 @@ mark { background: rgba(94, 240, 196, 0.18); color: var(--text); padding: 0 0.15
 .overview:hover .overview__hint { color: var(--text); }
 
 .mini-cube {
-  --s: 18px;
+  --s: 14px;
   position: relative;
   width: var(--s);
   height: var(--s);
@@ -203,6 +203,10 @@ mark { background: rgba(94, 240, 196, 0.18); color: var(--text); padding: 0 0.15
 /* Phones have no space bar, so the hint just says "Overview" */
 @media (max-width: 700px), (hover: none) {
   .overview__key { display: none; }
+}
+/* Phones: just the little cube in the header, no label */
+@media (max-width: 700px) {
+  .overview__hint { display: none; }
 }
 
 @media (max-width: 700px) {

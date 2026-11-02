@@ -27,12 +27,9 @@ export function initCube(cube) {
     <svg class="frame frame--outer" aria-hidden="true">${frameRect}</svg>
     <svg class="frame frame--inner" aria-hidden="true">${frameRect}</svg>`));
 
-  // ---------- Navigation bar: dots (where you are) and arrows (where you can go) ----------
+  // ---------- Navigation bar: the arrows (where you can go) ----------
   const navbar = document.querySelector('.navbar');
   navbar.insertAdjacentHTML('beforeend', `
-    <div class="dots" aria-hidden="true">
-      ${grid.map((panels) => `<span class="dots__col">${panels.map(() => '<i></i>').join('')}</span>`).join('')}
-    </div>
     <div class="arrows is-hint">
       <button class="arrow arrow--up" data-dir="up" aria-label="Up">↑</button>
       <button class="arrow arrow--left" data-dir="left" aria-label="Previous column">←</button>
@@ -61,7 +58,6 @@ export function initCube(cube) {
     }
     shownCol = col;
   }
-  const dotCols = [...navbar.querySelectorAll('.dots__col')];
   const status = document.getElementById('cube-status');
 
   arrows.addEventListener('click', (e) => {
@@ -99,10 +95,6 @@ export function initCube(cube) {
     updateArrows();
     updatePlace(col);
 
-    dotCols.forEach((dc, c) => {
-      dc.classList.toggle('is-current', c === col);
-      [...dc.children].forEach((dot, l) => dot.classList.toggle('is-active', c === col && l === level));
-    });
 
     // Tell screen readers where we are, and keep the place in the URL so a refresh stays put
     status.textContent = `${columns[col].dataset.title}: ${grid[col][level].dataset.level}`;

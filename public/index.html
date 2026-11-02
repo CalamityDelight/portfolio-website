@@ -24,7 +24,10 @@
   <canvas id="water" aria-hidden="true"></canvas>
 
   <header class="site-header">
-    <a class="logo" href="#home">Axel af Ugglas<span>AI video &amp; film</span></a>
+    <!-- Name, and the overview cube beside it (added by menu.js) -->
+    <div class="site-header__left">
+      <a class="logo" href="#home">Axel af Ugglas<span>AI video &amp; film</span></a>
+    </div>
     <!-- Where you are: "Introduction" or the project's title (set by cube.js) -->
     <p class="site-header__place" aria-hidden="true"></p>
     <!-- Filled by JS: the magnetic field readout (field.js) -->
@@ -206,8 +209,7 @@
     </div>
   </main>
 
-  <!-- Bottom centre: where you are (dots), which way you can go (arrows), and the overview cube.
-       Filled by cube.js and menu.js -->
+  <!-- Bottom centre: the arrow keys, showing which way you can go (filled by cube.js) -->
   <nav class="navbar" aria-label="Move around the site"></nav>
 
   <script src="/js/water.js"></script>

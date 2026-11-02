@@ -215,6 +215,7 @@ p { margin: 0 0 var(--space-2); max-width: var(--measure); }
   line-height: 1.5;
 }
 .logo span { display: block; font-weight: 400; color: var(--glow); opacity: 0.8; }
+.site-header__left { display: flex; align-items: center; gap: var(--space-3); }
 
 /* Where you are, in the middle of the header: "Introduction" or the project's title */
 .site-header__place {
