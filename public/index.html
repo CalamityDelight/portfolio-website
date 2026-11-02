@@ -25,6 +25,8 @@
 
   <header class="site-header">
     <a class="logo" href="#home">Axel af Ugglas<span>AI video &amp; film</span></a>
+    <!-- Where you are: "Introduction" or the project's title (set by cube.js) -->
+    <p class="site-header__place" aria-hidden="true"></p>
     <!-- Filled by JS: the magnetic field readout (field.js) -->
     <div class="site-header__right"></div>
   </header>
@@ -34,7 +36,7 @@
   <main id="cube" class="cube">
     <div class="cube__box">
 
-    <section class="column" id="home" data-title="Home">
+    <section class="column" id="home" data-title="Home" data-place="Introduction">
 
       <!-- Level 1: intro, a centred card with text and portrait -->
       <article class="panel" data-level="Intro">

@@ -42,6 +42,25 @@ export function initCube(cube) {
     <p class="sr-only" aria-live="polite" id="cube-status"></p>`);
 
   const arrows = navbar.querySelector('.arrows');
+  const place = document.querySelector('.site-header__place');
+  let shownCol = -1;
+
+  // The header names the column you are in: "Introduction", or the project's title.
+  // It only changes when you turn left or right, with a short fade.
+  function updatePlace(col) {
+    if (col === shownCol) return;
+    const text = columns[col].dataset.place || columns[col].dataset.title;
+    if (shownCol === -1) {
+      place.textContent = text; // first load: no fade
+    } else {
+      place.classList.add('is-changing');
+      setTimeout(() => {
+        place.textContent = text;
+        place.classList.remove('is-changing');
+      }, 250);
+    }
+    shownCol = col;
+  }
   const dotCols = [...navbar.querySelectorAll('.dots__col')];
   const status = document.getElementById('cube-status');
 
@@ -78,6 +97,7 @@ export function initCube(cube) {
   function updateUI() {
     const { col, level } = state;
     updateArrows();
+    updatePlace(col);
 
     dotCols.forEach((dc, c) => {
       dc.classList.toggle('is-current', c === col);
