@@ -1,13 +1,18 @@
 /* The cube. Only applies once cube.js has run (html.cube-ready), so without
    JavaScript the site is still one long readable page.
 
-   Every panel is a face of the cube, and the cube is the whole screen: the
-   magnetic field lives inside it and the content floats in the field. Only
-   while the cube turns do its faces and edges show, glowing faintly. */
+   The cube is a box drawn with thin holographic double lines, taking 90% of
+   the screen (the whole screen on phones). Every panel is one of its faces;
+   the content floats inside, with the background image around and behind it.
+   When the cube turns, its lines swap sides and shift colour a little. */
 
 :root {
   --header-h: 4.5rem;
-  --navbar-h: 5.5rem;
+  --navbar-h: 5rem;
+  --frame-x: 5vw;               /* the box's distance from the screen edges */
+  --frame-y: 5vh;
+  --line-a: rgba(168, 128, 245, 0.42); /* the frame's colours, a soft holographic purple */
+  --line-b: rgba(116, 140, 235, 0.24);
 }
 
 .cube-ready body { overflow: hidden; }
@@ -15,13 +20,13 @@
 .cube-ready .cube {
   position: fixed;
   inset: 0;
-  perspective: 1800px;          /* how deep the 3D turn looks: lower = more dramatic */
+  perspective: 2200px;          /* how deep the 3D turn looks: lower = more dramatic */
 }
 
 /* The box that turns. cube.js rotates it in 3D during a move. */
 .cube-ready .cube__box {
   position: absolute;
-  inset: 0;
+  inset: var(--frame-y) var(--frame-x);
   transform-style: preserve-3d;
 }
 .cube-ready .column {
@@ -34,50 +39,59 @@
   position: absolute;
   inset: 0;
   min-height: 0;
-  overflow-y: auto;             /* tall faces like the CV scroll inside themselves */
-  overscroll-behavior: contain;
-  touch-action: pan-y;          /* horizontal swipes are ours, vertical ones scroll */
+  overflow: hidden;
   container-type: size;         /* lets content size itself to the face (cqh units) */
   visibility: hidden;
   backface-visibility: hidden;
-  border: 1px solid transparent;
-  transition: background 0.4s, border-color 0.4s, box-shadow 0.4s;
-  scrollbar-width: thin;
-  scrollbar-color: var(--purple-dim) transparent;
-  /* Content dissolves into the dark near the header and the navigation bar,
-     so scrolling text never collides with them (no background box needed) */
-  --fade: linear-gradient(
-    transparent calc(var(--header-h) - 1.5rem), #000 calc(var(--header-h) + 1rem),
-    #000 calc(100% - var(--navbar-h) - 2.5rem), transparent calc(100% - var(--navbar-h) + 0.5rem));
-  -webkit-mask-image: var(--fade);
-  mask-image: var(--fade);
 }
 .cube-ready .panel.is-active { visibility: visible; }
 .cube-ready .panel:focus { outline: none; }
 
-/* While turning, the faces get a dark veil and glowing turquoise edges,
-   so the cube becomes visible as it rolls through the field */
-.cube-ready.is-turning .panel {
-  background: var(--face);
-  border-color: rgba(94, 240, 196, 0.35);
-  box-shadow: 0 0 60px rgba(94, 240, 196, 0.14), inset 0 0 80px rgba(94, 240, 196, 0.06);
-}
-
-/* Content clears the header at the top and the navigation bar at the bottom */
-.cube-ready .panel__inner {
-  min-height: 100%;
-  padding-top: calc(var(--header-h) + var(--space-3));
-  padding-bottom: calc(var(--navbar-h) + var(--space-2));
-}
-
-/* The turquoise particles canvas sits over the cube, under the header and navbar */
-#particles {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 15;
+/* The double frame lines, drawn on top of each face so they turn with it */
+.cube-ready .panel::before,
+.cube-ready .panel::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
   pointer-events: none;
+  border: 1px solid;
+  border-image: linear-gradient(125deg, var(--line-a), var(--line-b) 35%, var(--line-a) 65%, var(--line-b)) 1;
+  transition: filter 1.2s ease;
+}
+.cube-ready .panel::before { inset: 0; }
+.cube-ready .panel::after { inset: 8px; opacity: 0.55; }
+
+/* While turning, the lines drift towards turquoise and brighten slightly */
+.cube-ready.is-turning .panel::before,
+.cube-ready.is-turning .panel::after {
+  filter: hue-rotate(-60deg) brightness(1.35);
+}
+
+/* Inside each face, this layer scrolls. Content clears the header and the
+   navigation bar, and dissolves into the dark near them. */
+.cube-ready .panel__inner {
+  position: relative;
+  height: 100%;
+  max-width: none;
+  overflow-y: auto;             /* tall faces like the CV scroll inside themselves */
+  overscroll-behavior: contain;
+  touch-action: pan-y;          /* horizontal swipes are ours, vertical ones scroll */
+  padding: calc(var(--header-h) + var(--space-2)) max(var(--space-5), calc((100% - 66rem) / 2)) calc(var(--navbar-h) + var(--space-1));
+  scrollbar-width: none;        /* the frame stays clean */
+  --fade: linear-gradient(
+    transparent calc(var(--header-h) - 1rem), #000 calc(var(--header-h) + 1.5rem),
+    #000 calc(100% - var(--navbar-h) - 2rem), transparent calc(100% - var(--navbar-h) + 0.5rem));
+  -webkit-mask-image: var(--fade);
+  mask-image: var(--fade);
+}
+.cube-ready .panel__inner::-webkit-scrollbar { display: none; }
+
+/* The header and the navigation bar sit inside the frame */
+.cube-ready .site-header {
+  top: var(--frame-y);
+  left: var(--frame-x);
+  right: var(--frame-x);
+  padding: 0 var(--space-4);
 }
 
 /* ---------- Navigation bar: dots, arrows, overview cube ---------- */
@@ -85,7 +99,7 @@
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: var(--frame-y);
   height: var(--navbar-h);
   z-index: 20;
   display: none;
@@ -154,8 +168,12 @@
 }
 .dots i.is-active { background: var(--glow); box-shadow: 0 0 8px var(--glow); }
 
+/* Phones: the cube is the whole screen */
 @media (max-width: 700px) {
-  :root { --header-h: 4rem; --navbar-h: 5rem; }
-  .cube-ready .cube__box { left: 3vw; right: 3vw; }
+  :root { --header-h: 4rem; --navbar-h: 4.5rem; --frame-x: 0px; --frame-y: 0px; }
+  .cube-ready .panel::before { inset: 5px; }
+  .cube-ready .panel::after { inset: 11px; }
+  .cube-ready .panel__inner { padding-left: var(--space-3); padding-right: var(--space-3); }
+  .cube-ready .site-header { padding: 0 var(--space-3); }
   .navbar { gap: var(--space-3); }
 }

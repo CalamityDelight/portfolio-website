@@ -6,8 +6,7 @@
   opacity: 0.25;
   filter: blur(2px);
 }
-.menu-open .navbar,
-.menu-open #particles { opacity: 0; pointer-events: none; }
+.menu-open .navbar { opacity: 0; pointer-events: none; }
 .navbar { transition: opacity 0.4s; }
 
 .menu {
@@ -155,16 +154,16 @@ mark { background: rgba(94, 240, 196, 0.18); color: var(--text); padding: 0 0.15
   perspective: 160px;
 }
 .overview__hint {
-  font-size: 0.625rem;
+  font-size: 0.5rem;
   letter-spacing: var(--track-label);
   text-transform: uppercase;
   white-space: nowrap;
   transition: color 0.2s;
 }
-.overview:hover .overview__hint { color: var(--glow); }
+.overview:hover .overview__hint { color: var(--text); }
 
 .mini-cube {
-  --s: 22px;
+  --s: 18px;
   position: relative;
   width: var(--s);
   height: var(--s);
@@ -179,10 +178,10 @@ mark { background: rgba(94, 240, 196, 0.18); color: var(--text); padding: 0 0.15
 .mini-cube__face {
   position: absolute;
   inset: 0;
-  border: 1px solid rgba(94, 240, 196, 0.8);
-  background: rgba(94, 240, 196, 0.05);
-  box-shadow: 0 0 6px rgba(94, 240, 196, 0.35), inset 0 0 4px rgba(94, 240, 196, 0.25);
+  border: 1px solid rgba(150, 110, 230, 0.45);  /* quiet dark purple, like the frame */
+  background: rgba(90, 50, 170, 0.06);
 }
+.overview:hover .mini-cube__face { border-color: rgba(168, 128, 245, 0.8); }
 .mini-cube__face--front  { transform: translateZ(calc(var(--s) / 2)); }
 .mini-cube__face--back   { transform: rotateY(180deg) translateZ(calc(var(--s) / 2)); }
 .mini-cube__face--right  { transform: rotateY(90deg) translateZ(calc(var(--s) / 2)); }

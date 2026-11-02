@@ -16,12 +16,12 @@ Built for the Berghs individual blog project (Programming & Methods, ACE2627).
 | 2 PD | Comments stored in a database | Visitors comment at the bottom of each post. First name, last name and email are required; comments are saved in Neon and appear at once. Only the first name is shown. |
 | 3 | Readable text, large and small screens | 18 px body text (17 px on phones), small labels, layouts tested from 375 px phones to 1920 px screens. Swipe navigation on touch screens. |
 | 4 | Search, filter or theme switcher | **Tag filter** in the Overview menu: pick a tool, skill or role to see every process paragraph that mentions it, labelled by work. "Read more" opens the work at that paragraph. |
-| 5 | External API | **NOAA Kp index** (Earth's magnetic field). The header shows "Earth's magnetic field · Kp 2 · calm" with a small line that ripples as hard as the field, and smoky purple magnetic wisps drift behind the site, faster and more turbulent from Kp 0 to 9. Visitors can turn the effects off; the background then becomes a still image. |
+| 5 | External API | **NOAA Kp index** (Earth's magnetic field). The header shows "Earth's magnetic field · Kp 2 · calm" with a small line that ripples as hard as the field, and barely visible purple magnetic field lines vibrate in the background, faster and stronger from Kp 0 to 9. Visitors can turn the effects off; the background then stays a still image. |
 | 6 | Sign in, sign out; sign-in required to add posts | Discreet **login** link at the bottom of the CV. Username and password, bcrypt-hashed, kept in a session cookie. All write routes check the session. |
 | 7 PD | AI API | **Automatic summary** (option d) with Claude through the Anthropic API. In the studio Axel generates a draft from the title, process and tags, edits it and approves it. Only the approved text is published, under the video. |
 | 8 PD | Posts and comments in Neon | Posts, comments and the login live in Neon Postgres (`db/schema.sql`). |
 
-Other features: the site is a full-screen 3D cube that turns 90° when you move, with glowing particles drifting off its edges; the background reacts to the mouse like bioluminescent water (it lights up, parts around the cursor and ripples on click); navigation by arrow keys, phone swipes and two-finger trackpad swipes; a navigation bar with a dot indicator, arrow keys and a small overview cube; a custom video player; and uploads of video and reference images to Cloudinary from the studio.
+Other features: the site is a 3D cube drawn with thin holographic lines (90% of the screen, full screen on phones) that turns 90° when you move; the background image comes alive with WebGL, with turquoise that slowly seeps like paint in water, a faint "wind on water" under the mouse and a ripple of turquoise ink where you click; navigation by arrow keys, phone swipes and two-finger trackpad swipes; a navigation bar with a dot indicator, arrow keys and a small overview cube; a custom video player; and uploads of video and reference images to Cloudinary from the studio.
 
 ## What was left out on purpose
 
@@ -111,15 +111,15 @@ No account or key. The server reads `https://services.swpc.noaa.gov/products/noa
 **Visitors**
 - **Arrow keys**, the arrows in the bar at the bottom, a **two-finger trackpad swipe** or a **phone swipe**: left/right turn the cube between Home and the works (always landing at the top), up/down go through a column. Tall faces scroll first.
 - **Space, Enter** or the small **cube** at the bottom opens the overview map and the tag filter. **Esc** closes it.
-- **Move the mouse** over the page to stir the field; **click** to send out a ripple.
-- **Turn off effects** (top right) stops the magnetic waves and the mouse effects, and shows a still background image.
+- **Move the mouse** over the page like wind over water; **click** to drop turquoise ink into it.
+- **Turn off effects** (top right) stops all background movement and shows the still image.
 
 **Axel**
 - Click **login** at the bottom of the CV, sign in, and you are in the studio.
 - **+ New work**: fill in the title, year and position (the order in the cube), upload a video, write process blocks (text or lists; reorder with the arrows), upload reference images (alt text required) and pick tags.
 - **Generate summary** writes a draft from the title, process and tags. Edit it, click **Approve draft**, then **Save**.
 - The tag list for the filter and studio is `public/data/tags.json`.
-- The still background shown when effects are off is `public/img/field-still.jpg` (a Midjourney image). Replace the file to change it.
+- The background is `public/img/background.jpg`. Replace the file to change it; the animation uses whatever image is there.
 
 ## Project structure
 
@@ -141,10 +141,10 @@ views/studio.html       The studio page (only sent to a signed-in user)
 public/index.html       Page shell, Home column (intro and CV)
 public/login.html       Sign-in page
 public/css/             base (design system), home, work, cube, menu, field, studio
-public/js/              app (entry), works, player, cube (3D turns, swipes), particles,
-                        menu, comments, field (Kp readout), magnetic (background
-                        waves), account, studio
-public/img/             field-still.jpg, the still background when effects are off
+public/js/              app (entry), works, player, cube (3D turns, swipes), menu,
+                        comments, field (Kp readout), water (WebGL background),
+                        account, studio
+public/img/             background.jpg, the background image
 public/data/tags.json   The fixed tag list
 ```
 
