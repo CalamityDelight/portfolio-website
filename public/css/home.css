@@ -18,7 +18,7 @@
 .intro__text h1 { margin: var(--space-2) 0 var(--space-3); }
 .intro__text .lead { margin: 0; color: var(--text-muted); }
 
-.intro__image { margin: 0; }
+.intro__image { margin: 0; transform: translateX(-3rem); }   /* nudged in towards the middle */
 /* The animated portrait: no frame or background, it fades into the field */
 .portrait {
   aspect-ratio: 4 / 5;
@@ -101,7 +101,7 @@
 /* ---------- Phones and narrow screens ---------- */
 @media (max-width: 800px) {
   .intro__card { grid-template-columns: 1fr; gap: var(--space-4); }
-  .intro__image { order: -1; width: 62%; }
+  .intro__image { order: -1; width: 62%; transform: none; }
 
   .cv__section { grid-template-columns: 1fr; gap: var(--space-2); }
   .cv__list li { grid-template-columns: 1fr; gap: 0; }
