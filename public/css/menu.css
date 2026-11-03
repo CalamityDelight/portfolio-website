@@ -178,7 +178,8 @@ mark { background: rgba(94, 240, 196, 0.18); color: var(--text); padding: 0 0.15
 .mini-cube__face {
   position: absolute;
   inset: 0;
-  border: 1px solid rgba(150, 110, 230, 0.6);  /* quiet dark purple, like the frame */
+  border: 1px solid rgba(190, 155, 255, 1);  /* purple, like the frame, but brighter so it stands out */
+  box-shadow: 0 0 6px rgba(160, 120, 245, 0.7), inset 0 0 4px rgba(160, 120, 245, 0.45);
   /* Each face fades in and out at its own time, so the cube looks like it is
      slowly being built from lines */
   animation: mini-build 6s ease-in-out infinite;
@@ -189,7 +190,7 @@ mark { background: rgba(94, 240, 196, 0.18); color: var(--text); padding: 0 0.15
 .mini-cube__face--top { animation-delay: -4s; }
 .mini-cube__face--bottom { animation-delay: -5s; }
 @keyframes mini-build {
-  0%, 100% { opacity: 0.15; }
+  0%, 100% { opacity: 0.55; }
   50% { opacity: 1; }
 }
 .overview:hover .mini-cube__face { border-color: rgba(178, 136, 255, 0.95); }
